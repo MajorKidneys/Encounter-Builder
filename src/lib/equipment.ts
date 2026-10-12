@@ -115,7 +115,7 @@ export const nativeArmorFor = (id: string | null | undefined) =>
 export function combatantFromLibrary(m: LibraryMonster): Combatant {
   const stats = fromLibrary(m);
   return installNativeGear(
-    { id: uid(), init: 0, qty: 1, name: stats.name, isPC: false, maxHp: stats.hp, units: makeUnits(1, stats.hp), loot: [], currency: { cp: 0, sp: 0, gp: 0, pp: 0 }, notes: '' },
+    { id: uid(), init: null, qty: 1, name: stats.name, isPC: false, maxHp: stats.hp, units: makeUnits(1, stats.hp), loot: [], currency: { cp: 0, sp: 0, gp: 0, pp: 0 }, notes: '' },
     stats,
     nativeArmorFor(stats.srdId),
   );

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require("electron");
+const { app, BrowserWindow, nativeTheme, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const http = require("http");
@@ -20,6 +20,7 @@ const TYPES = {
   ".jpg": "image/jpeg",
   ".ico": "image/x-icon",
   ".woff2": "font/woff2",
+  ".webmanifest": "application/manifest+json",
   ".txt": "text/plain; charset=utf-8",
 };
 
@@ -55,7 +56,9 @@ function createWindow(url = ORIGIN + "/") {
     minWidth: 900,
     minHeight: 600,
     title: "Encounter Tracker",
-    backgroundColor: "#f7f3ea",
+    icon: path.join(__dirname, "icon", "icon.png"),
+    // Match the app background so launch doesn't flash a different color.
+    backgroundColor: nativeTheme.shouldUseDarkColors ? "#2c1c1d" : "#f2f3f2",
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
