@@ -1,0 +1,111 @@
+{
+  "assassin": [
+    "studded-leather"
+  ],
+  "azer": [
+    "shield"
+  ],
+  "bandit": [
+    "leather"
+  ],
+  "bandit-captain": [
+    "studded-leather"
+  ],
+  "berserker": [
+    "hide"
+  ],
+  "bugbear": [
+    "shield",
+    "hide"
+  ],
+  "cult-fanatic": [
+    "leather"
+  ],
+  "cultist": [
+    "leather"
+  ],
+  "deep-gnome-svirfneblin": [
+    "chain-shirt"
+  ],
+  "drow": [
+    "chain-shirt"
+  ],
+  "duergar": [
+    "scale-mail",
+    "shield"
+  ],
+  "erinyes": [
+    "plate"
+  ],
+  "fire-giant": [
+    "plate"
+  ],
+  "gladiator": [
+    "studded-leather",
+    "shield"
+  ],
+  "gnoll": [
+    "hide",
+    "shield"
+  ],
+  "goblin": [
+    "leather",
+    "shield"
+  ],
+  "guard": [
+    "chain-shirt",
+    "shield"
+  ],
+  "half-red-dragon-veteran": [
+    "plate"
+  ],
+  "hobgoblin": [
+    "chain-mail",
+    "shield"
+  ],
+  "knight": [
+    "plate"
+  ],
+  "lizardfolk": [
+    "shield"
+  ],
+  "noble": [
+    "breastplate"
+  ],
+  "ogre": [
+    "hide"
+  ],
+  "oni": [
+    "chain-mail"
+  ],
+  "orc": [
+    "hide"
+  ],
+  "priest": [
+    "chain-shirt"
+  ],
+  "satyr": [
+    "leather"
+  ],
+  "scout": [
+    "leather"
+  ],
+  "sprite": [
+    "leather"
+  ],
+  "storm-giant": [
+    "scale-mail"
+  ],
+  "thug": [
+    "leather"
+  ],
+  "tribal-warrior": [
+    "hide"
+  ],
+  "veteran": [
+    "splint"
+  ],
+  "wight": [
+    "studded-leather"
+  ]
+}

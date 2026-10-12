@@ -1,0 +1,12 @@
+# Requested changes
+- [x] Import a monster straight from the encounter table via the same search lightbox.
+- [x] Bundle available monster description text and add an independently collapsible, editable description section.
+- [x] Verify description import, existing-creature compatibility, and persistence without changing HP.
+- [x] Make the campaign name editable and locally saved, defaulting to YOUR ADVENTURE.
+- [x] Match encounter-name edit visibility to favorite names and verify persistence.
+- [x] Share the left menu between encounters and spells, with add controls beneath their respective lists.
+- [x] Verify navigation, favorite lists, and encounter persistence.
+- [x] Confirm imports that overwrite existing stats.
+- [x] Bundle equipment data and link native/imported and manually added gear to attacks and AC.
+- [x] Add gear tagging, swaps, removals and manual overrides without changing ordinary loot.
+- [x] Test gear calculations and verify the full browser flow.

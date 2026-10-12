@@ -1,0 +1,463 @@
+[
+  {
+    "id": "club",
+    "name": "Club",
+    "kind": "weapon",
+    "dice": "1d4",
+    "damageType": "bludgeoning",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "dagger",
+    "name": "Dagger",
+    "kind": "weapon",
+    "dice": "1d4",
+    "damageType": "piercing",
+    "finesse": true,
+    "ranged": false,
+    "thrown": true
+  },
+  {
+    "id": "greatclub",
+    "name": "Greatclub",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "bludgeoning",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "handaxe",
+    "name": "Handaxe",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "slashing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": true
+  },
+  {
+    "id": "javelin",
+    "name": "Javelin",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": true
+  },
+  {
+    "id": "light-hammer",
+    "name": "Light hammer",
+    "kind": "weapon",
+    "dice": "1d4",
+    "damageType": "bludgeoning",
+    "finesse": false,
+    "ranged": false,
+    "thrown": true
+  },
+  {
+    "id": "mace",
+    "name": "Mace",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "bludgeoning",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "quarterstaff",
+    "name": "Quarterstaff",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "bludgeoning",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "sickle",
+    "name": "Sickle",
+    "kind": "weapon",
+    "dice": "1d4",
+    "damageType": "slashing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "spear",
+    "name": "Spear",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": true
+  },
+  {
+    "id": "light-crossbow",
+    "name": "Light crossbow",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": true,
+    "thrown": false
+  },
+  {
+    "id": "dart",
+    "name": "Dart",
+    "kind": "weapon",
+    "dice": "1d4",
+    "damageType": "piercing",
+    "finesse": true,
+    "ranged": true,
+    "thrown": true
+  },
+  {
+    "id": "shortbow",
+    "name": "Shortbow",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": true,
+    "thrown": false
+  },
+  {
+    "id": "sling",
+    "name": "Sling",
+    "kind": "weapon",
+    "dice": "1d4",
+    "damageType": "bludgeoning",
+    "finesse": false,
+    "ranged": true,
+    "thrown": false
+  },
+  {
+    "id": "battleaxe",
+    "name": "Battleaxe",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "slashing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "flail",
+    "name": "Flail",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "bludgeoning",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "glaive",
+    "name": "Glaive",
+    "kind": "weapon",
+    "dice": "1d10",
+    "damageType": "slashing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "greataxe",
+    "name": "Greataxe",
+    "kind": "weapon",
+    "dice": "1d12",
+    "damageType": "slashing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "greatsword",
+    "name": "Greatsword",
+    "kind": "weapon",
+    "dice": "2d6",
+    "damageType": "slashing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "halberd",
+    "name": "Halberd",
+    "kind": "weapon",
+    "dice": "1d10",
+    "damageType": "slashing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "lance",
+    "name": "Lance",
+    "kind": "weapon",
+    "dice": "1d12",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "longsword",
+    "name": "Longsword",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "slashing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "maul",
+    "name": "Maul",
+    "kind": "weapon",
+    "dice": "2d6",
+    "damageType": "bludgeoning",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "morningstar",
+    "name": "Morningstar",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "pike",
+    "name": "Pike",
+    "kind": "weapon",
+    "dice": "1d10",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "rapier",
+    "name": "Rapier",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "piercing",
+    "finesse": true,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "scimitar",
+    "name": "Scimitar",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "slashing",
+    "finesse": true,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "shortsword",
+    "name": "Shortsword",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "piercing",
+    "finesse": true,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "trident",
+    "name": "Trident",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": true
+  },
+  {
+    "id": "war-pick",
+    "name": "War pick",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "warhammer",
+    "name": "Warhammer",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "bludgeoning",
+    "finesse": false,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "whip",
+    "name": "Whip",
+    "kind": "weapon",
+    "dice": "1d4",
+    "damageType": "slashing",
+    "finesse": true,
+    "ranged": false,
+    "thrown": false
+  },
+  {
+    "id": "blowgun",
+    "name": "Blowgun",
+    "kind": "weapon",
+    "dice": "1",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": true,
+    "thrown": false
+  },
+  {
+    "id": "hand-crossbow",
+    "name": "Hand crossbow",
+    "kind": "weapon",
+    "dice": "1d6",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": true,
+    "thrown": false
+  },
+  {
+    "id": "heavy-crossbow",
+    "name": "Heavy crossbow",
+    "kind": "weapon",
+    "dice": "1d10",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": true,
+    "thrown": false
+  },
+  {
+    "id": "longbow",
+    "name": "Longbow",
+    "kind": "weapon",
+    "dice": "1d8",
+    "damageType": "piercing",
+    "finesse": false,
+    "ranged": true,
+    "thrown": false
+  },
+  {
+    "id": "net",
+    "name": "Net",
+    "kind": "weapon",
+    "dice": "",
+    "damageType": "",
+    "finesse": false,
+    "ranged": true,
+    "thrown": false
+  },
+  {
+    "id": "padded",
+    "name": "Padded",
+    "kind": "armor",
+    "ac": 11,
+    "dexCap": 99
+  },
+  {
+    "id": "leather",
+    "name": "Leather",
+    "kind": "armor",
+    "ac": 11,
+    "dexCap": 99
+  },
+  {
+    "id": "studded-leather",
+    "name": "Studded leather",
+    "kind": "armor",
+    "ac": 12,
+    "dexCap": 99
+  },
+  {
+    "id": "hide",
+    "name": "Hide",
+    "kind": "armor",
+    "ac": 12,
+    "dexCap": 2
+  },
+  {
+    "id": "chain-shirt",
+    "name": "Chain shirt",
+    "kind": "armor",
+    "ac": 13,
+    "dexCap": 2
+  },
+  {
+    "id": "scale-mail",
+    "name": "Scale mail",
+    "kind": "armor",
+    "ac": 14,
+    "dexCap": 2
+  },
+  {
+    "id": "breastplate",
+    "name": "Breastplate",
+    "kind": "armor",
+    "ac": 14,
+    "dexCap": 2
+  },
+  {
+    "id": "half-plate",
+    "name": "Half plate",
+    "kind": "armor",
+    "ac": 15,
+    "dexCap": 2
+  },
+  {
+    "id": "ring-mail",
+    "name": "Ring mail",
+    "kind": "armor",
+    "ac": 14,
+    "dexCap": 0
+  },
+  {
+    "id": "chain-mail",
+    "name": "Chain mail",
+    "kind": "armor",
+    "ac": 16,
+    "dexCap": 0
+  },
+  {
+    "id": "splint",
+    "name": "Splint",
+    "kind": "armor",
+    "ac": 17,
+    "dexCap": 0
+  },
+  {
+    "id": "plate",
+    "name": "Plate",
+    "kind": "armor",
+    "ac": 18,
+    "dexCap": 0
+  },
+  {
+    "id": "shield",
+    "name": "Shield",
+    "kind": "armor",
+    "ac": 2,
+    "shield": true
+  }
+]
