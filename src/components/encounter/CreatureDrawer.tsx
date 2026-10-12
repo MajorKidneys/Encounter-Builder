@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { useWorkspace } from "@/components/Workspace";
+import { CharacterUses } from "@/components/party/CharacterUses";
 import { ConditionChips } from "./ConditionChips";
 import { HpMeter } from "./HpControls";
 import { statSource } from "./InitiativeList";
@@ -26,6 +28,8 @@ export function CreatureDrawer({
   onClose: () => void;
   update: (fn: (c: Combatant) => Combatant) => void;
 }) {
+  const { characters, setCharacters } = useWorkspace();
+  const saved = characters.find((person) => person.id === c.characterId) ?? null;
   const [unitIdx, setUnitIdx] = useState(0);
   useEffect(() => setUnitIdx(0), [c.id]);
   const idx = Math.min(unitIdx, c.units.length - 1);
@@ -174,6 +178,16 @@ export function CreatureDrawer({
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pb-6 pt-1">
+        {saved && (
+          <Section id="character-uses" title="Slots and uses">
+            <CharacterUses
+              character={saved}
+              onChange={(next) =>
+                setCharacters((all) => all.map((person) => (person.id === next.id ? next : person)))
+              }
+            />
+          </Section>
+        )}
         <MonsterPanel key={c.id} c={c} update={update} />
         <Section
           id="currency"

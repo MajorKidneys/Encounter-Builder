@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PartyRouteImport } from './routes/party'
 import { Route as SpellsRouteImport } from './routes/spells'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartyRoute = PartyRouteImport.update({
+  id: '/party',
+  path: '/party',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SpellsRoute = SpellsRouteImport.update({
@@ -25,27 +31,31 @@ const SpellsRoute = SpellsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/party': typeof PartyRoute
   '/spells': typeof SpellsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/party': typeof PartyRoute
   '/spells': typeof SpellsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/party': typeof PartyRoute
   '/spells': typeof SpellsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/spells'
+  fullPaths: '/' | '/party' | '/spells'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/spells'
-  id: '__root__' | '/' | '/spells'
+  to: '/' | '/party' | '/spells'
+  id: '__root__' | '/' | '/party' | '/spells'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PartyRoute: typeof PartyRoute
   SpellsRoute: typeof SpellsRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/party': {
+      id: '/party'
+      path: '/party'
+      fullPath: '/party'
+      preLoaderRoute: typeof PartyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/spells': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PartyRoute: PartyRoute,
   SpellsRoute: SpellsRoute,
 }
 export const routeTree = rootRouteImport
