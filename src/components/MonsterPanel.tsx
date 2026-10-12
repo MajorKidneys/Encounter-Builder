@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, Download, Minus, Plus, RotateCcw, X } from "lucide-react";
+import { Download, Minus, Plus, RotateCcw, X } from "lucide-react";
 import type { Combatant } from "@/lib/encounters";
 import { uid } from "@/lib/encounters";
 import {
@@ -15,12 +15,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { SpellcastingBlock } from "@/components/SpellcastingBlock";
 import { installNativeGear, nativeArmorFor, syncGear } from '@/lib/equipment';
 import { DescriptionSection } from '@/components/DescriptionSection';
 import { MonsterImportDialog } from '@/components/MonsterImportDialog';
+import { Section } from '@/components/Section';
+import { StatSummary } from '@/components/StatSummary';
 
 const ABS = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
 const RESETS: ResetOn[] = ["turn", "round", "short", "long"];
@@ -29,7 +30,6 @@ const n = (v: string) => (v === "" || isNaN(Number(v)) ? 0 : Number(v));
 
 export function MonsterPanel({ c, update }: { c: Combatant; update: (fn: (c: Combatant) => Combatant) => void }) {
   const [open, setOpen] = useState(false);
-  const [expanded, setExpanded] = useState(true);
   const [libraryDescription, setLibraryDescription] = useState("");
   const s = c.stats ?? { ...blankStats(c.name), hp: c.maxHp ?? 10 };
   useEffect(() => {
@@ -59,38 +59,44 @@ export function MonsterPanel({ c, update }: { c: Combatant; update: (fn: (c: Com
     if (m) applyStats(fromLibrary(m));
   };
 
+  const addSpellcasting = () => set({ spells: [...s.spells, { name: "Spellcasting", dc: null, attack: null, ability: "", list: "" }] });
+  const addResource = () => set({ resources: [...s.resources, { id: uid(), name: "", max: 1, current: 1, reset: "long" }] });
+  const addBtn = (labelText: string, onClick: () => void) => (
+    <Button size="sm" variant="ghost" className="h-7 px-2" aria-label={labelText} title={labelText} onClick={onClick}><Plus className="h-4 w-4" /></Button>
+  );
+
   return (
-    <Collapsible open={expanded} onOpenChange={setExpanded} className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <h3 className="mr-auto">
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="gap-1 px-0 font-semibold" aria-label={expanded ? "Collapse stats" : "Expand stats"} title={expanded ? "Collapse stats" : "Expand stats"}>
-              <ChevronDown className={cn("h-4 w-4", !expanded && "-rotate-90")} /> Stats
-            </Button>
-          </CollapsibleTrigger>
-        </h3>
-        <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
-          <Download className="h-4 w-4" /> Import stats
-        </Button>
-        {s?.srdId && (
-          <Button size="sm" variant="ghost" onClick={resetSrd}>
-            <RotateCcw className="h-4 w-4" /> Reset to SRD
-          </Button>
-        )}
-      </div>
-      <CollapsibleContent>
+    <div className="grid">
+      {c.stats && (
+        <Section id="summary" title="At a glance">
+          <StatSummary s={s} />
+        </Section>
+      )}
+      <Section id="resources" title="Resources" count={s.resources.length || undefined} actions={addBtn("Add resource", addResource)}>
+        {s.resources.length ? <Resources s={s} set={set} /> : <p className="text-sm text-muted-foreground">Recharge abilities, legendary actions and other limited uses. Turn and round resources refill on their own during combat.</p>}
+      </Section>
+      <Section id="spellcasting" title="Spellcasting" count={s.spells.length || undefined} actions={addBtn("Add spellcasting", addSpellcasting)}>
+        {s.spells.length ? s.spells.map((sp, i) => (
+          <SpellcastingBlock key={i} sp={sp} onChange={(p) => set({ spells: s.spells.map((x, j) => (j === i ? { ...x, ...p } : x)) })} onRemove={() => set({ spells: s.spells.filter((_, j) => j !== i) })} />
+        )) : <p className="text-sm text-muted-foreground">No spellcasting.</p>}
+      </Section>
+      <Section id="statblock" title={c.stats ? "Edit stats" : "Stats"} initial={!c.stats}
+        actions={<>
+          <Button size="sm" variant="outline" className="h-7" onClick={() => setOpen(true)}><Download className="h-4 w-4" /> Import stats</Button>
+          {s?.srdId && <Button size="sm" variant="ghost" className="h-7" onClick={resetSrd}><RotateCcw className="h-4 w-4" /> Reset to SRD</Button>}
+        </>}>
         <StatForm s={s} set={set} />
-      </CollapsibleContent>
+      </Section>
       <DescriptionSection key={c.id} description={s.description ?? libraryDescription} onChange={(description) => set({ description })} />
-      <p className="text-xs text-muted-foreground">
+      <p className="mt-3 text-xs text-muted-foreground">
         Monster data from the System Reference Document 5.1 by Wizards of the Coast LLC (CC-BY-4.0) and the
         Monstrous Menagerie by EN Publishing (OGL 1.0a, via Open5e).
       </p>
       <MonsterImportDialog open={open} onOpenChange={setOpen} onImport={(m) => {
         if ((c.stats || c.maxHp !== null) && !confirm("Replace this creature's existing stats and native gear? Your stat edits will be lost and HP will reset to full.")) return;
-        applyStats(fromLibrary(m)); setOpen(false); setExpanded(true);
+        applyStats(fromLibrary(m)); setOpen(false);
       }} />
-    </Collapsible>
+    </div>
   );
 }
 
@@ -164,22 +170,10 @@ function StatForm({ s, set }: { s: MonsterStats; set: (p: Partial<MonsterStats>)
       {txt("resist", "Damage resistances")}
       {txt("immune", "Damage immunities")}
       {txt("condImmune", "Condition immunities")}
-      <Resources s={s} set={set} />
       <FeatureList title="Special abilities" items={s.special} onChange={(special) => set({ special })} />
       <FeatureList title="Actions" items={s.actions} onChange={(actions) => set({ actions })} />
       <FeatureList title="Reactions" items={s.reactions} onChange={(reactions) => set({ reactions })} />
       <FeatureList title="Legendary actions" items={s.legendary} onChange={(legendary) => set({ legendary })} />
-      <div>
-        <div className="mb-1 flex items-center justify-between">
-          <h4 className="text-sm font-semibold">Spellcasting</h4>
-          <Button size="sm" variant="ghost" className="h-7" onClick={() => set({ spells: [...s.spells, { name: "Spellcasting", dc: null, attack: null, ability: "", list: "" }] })}>
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-        {s.spells.map((sp, i) => (
-          <SpellcastingBlock key={i} sp={sp} onChange={(p) => set({ spells: s.spells.map((x, j) => (j === i ? { ...x, ...p } : x)) })} onRemove={() => set({ spells: s.spells.filter((_, j) => j !== i) })} />
-        ))}
-      </div>
     </div>
   );
 }
@@ -226,12 +220,6 @@ function Resources({ s, set }: { s: MonsterStats; set: (p: Partial<MonsterStats>
   };
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between">
-        <h4 className="text-sm font-semibold">Resources</h4>
-        <Button size="sm" variant="ghost" className="h-7" aria-label="Add resource" onClick={() => set({ resources: [...rs, { id: uid(), name: "", max: 1, current: 1, reset: "long" }] })}>
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
       {rs.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-1">
           {RESETS.map((t) => (

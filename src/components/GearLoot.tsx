@@ -57,7 +57,7 @@ export function GearLoot({ c, update }: { c: Combatant; update: (fn: (c: Combata
   const showsBonus = kind === 'weapon' || kind === 'armor' || (kind === 'homebrew' && !!base);
 
   return <section>
-    <h3 className="mb-2 font-semibold">Loot</h3>
+    {/* Heading comes from the drawer section. */}
     <div className="rounded-md border border-border bg-card">
       {c.loot.length === 0 && <p className="px-3 py-3 text-sm text-muted-foreground">No items.</p>}
       {c.loot.map(l => {

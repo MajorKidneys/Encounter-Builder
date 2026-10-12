@@ -2,7 +2,8 @@
 @source "../src";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* Dark mode follows the Mac's appearance setting (Electron passes it through). */
+@custom-variant dark (@media (prefers-color-scheme: dark));
 
 /*
  * Design system definition.
@@ -10,11 +11,11 @@
  * The @theme inline block maps CSS custom properties to Tailwind utility
  * classes (e.g. --color-primary -> bg-primary, text-primary).
  *
- * The :root and .dark blocks define the actual color values using oklch.
+ * The :root block and its prefers-color-scheme: dark override define the color values using oklch.
  * All colors MUST use oklch format.
  *
  * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 1. Add the variable to :root (light value) and the dark media block (dark value)
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  */
 
@@ -51,8 +52,16 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --font-display: "Cinzel", serif;
-  --font-sans: "Lora", Georgia, serif;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
+  --font-sans: "Instrument Sans", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --color-wine-ink: var(--wine-ink);
+  --color-teal: var(--teal);
+  --color-teal-foreground: var(--teal-foreground);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-bronze: var(--bronze);
+  --color-surface: var(--surface);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -63,78 +72,101 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/*
+ * Palette: oxblood #2c1c1d, pale grey #F2F3F2, bronze #927E5A, teal #4A646C, amber #B6862C, wine #66023C.
+ * Wine = current turn, lists and primary actions. Teal = labels, healthy HP, heal, stat sources.
+ * Amber (gold) = concentration, hold, bloodied. Bronze = small section labels. Destructive = damage.
+ */
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.97 0.015 85);
-  --foreground: oklch(0.25 0.03 50);
-  --card: oklch(0.99 0.01 85);
-  --card-foreground: oklch(0.25 0.03 50);
-  --popover: oklch(0.99 0.01 85);
-  --popover-foreground: oklch(0.25 0.03 50);
-  --primary: oklch(0.42 0.13 28);
-  --primary-foreground: oklch(0.98 0.01 85);
-  --secondary: oklch(0.92 0.03 80);
-  --secondary-foreground: oklch(0.25 0.03 50);
-  --muted: oklch(0.93 0.02 80);
-  --muted-foreground: oklch(0.5 0.03 60);
-  --accent: oklch(0.9 0.04 80);
-  --accent-foreground: oklch(0.25 0.03 50);
-  --destructive: oklch(0.55 0.2 27);
-  --destructive-foreground: oklch(0.98 0.01 85);
-  --border: oklch(0.82 0.03 75);
-  --input: oklch(0.8 0.03 75);
-  --ring: oklch(0.42 0.13 28);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.94 0.025 82);
-  --sidebar-foreground: oklch(0.25 0.03 50);
-  --sidebar-primary: oklch(0.42 0.13 28);
-  --sidebar-primary-foreground: oklch(0.98 0.01 85);
-  --sidebar-accent: oklch(0.9 0.04 80);
-  --sidebar-accent-foreground: oklch(0.25 0.03 50);
-  --sidebar-border: oklch(0.82 0.03 75);
-  --sidebar-ring: oklch(0.42 0.13 28);
+  --background: oklch(0.963 0.002 145.6);
+  --foreground: oklch(0.247 0.025 14.9);
+  --surface: oklch(1 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.247 0.025 14.9);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.247 0.025 14.9);
+  --primary: oklch(0.335 0.136 353.6);
+  --primary-foreground: oklch(1 0 0);
+  --wine-ink: oklch(0.335 0.136 353.6);
+  --secondary: oklch(0.932 0.003 197.1);
+  --secondary-foreground: oklch(0.437 0.03 218.5);
+  --muted: oklch(0.931 0.007 88.6);
+  --muted-foreground: oklch(0.52 0.019 215.6);
+  --accent: oklch(0.937 0.016 347.6);
+  --accent-foreground: oklch(0.247 0.025 14.9);
+  --destructive: oklch(0.53 0.153 31.4);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.247 0.025 14.9 / 12%);
+  --input: oklch(0.247 0.025 14.9 / 22%);
+  --ring: oklch(0.335 0.136 353.6);
+  --teal: oklch(0.486 0.033 218.7);
+  --teal-foreground: oklch(0.416 0.03 222.3);
+  --gold: oklch(0.651 0.119 79.1);
+  --gold-foreground: oklch(0.439 0.084 78.8);
+  --bronze: oklch(0.526 0.052 81.5);
+  --chart-1: oklch(0.335 0.136 353.6);
+  --chart-2: oklch(0.486 0.033 218.7);
+  --chart-3: oklch(0.651 0.119 79.1);
+  --chart-4: oklch(0.602 0.056 81.9);
+  --chart-5: oklch(0.53 0.153 31.4);
+  --sidebar: oklch(0.931 0.007 88.6);
+  --sidebar-foreground: oklch(0.247 0.025 14.9);
+  --sidebar-primary: oklch(0.335 0.136 353.6);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.937 0.016 347.6);
+  --sidebar-accent-foreground: oklch(0.335 0.136 353.6);
+  --sidebar-border: oklch(0.247 0.025 14.9 / 12%);
+  --sidebar-ring: oklch(0.335 0.136 353.6);
+  color-scheme: light;
 }
 
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.247 0.025 14.9);
+    --foreground: oklch(0.963 0.002 145.6);
+    --surface: oklch(0.291 0.027 15.2);
+    --card: oklch(0.291 0.027 15.2);
+    --card-foreground: oklch(0.963 0.002 145.6);
+    --popover: oklch(0.291 0.027 15.2);
+    --popover-foreground: oklch(0.963 0.002 145.6);
+    --primary: oklch(0.433 0.157 353.6);
+    --primary-foreground: oklch(1 0 0);
+    --wine-ink: oklch(0.767 0.114 346.4);
+    --secondary: oklch(0.309 0.021 13.5);
+    --secondary-foreground: oklch(0.81 0.034 215.6);
+    --muted: oklch(0.309 0.021 13.5);
+    --muted-foreground: oklch(0.779 0.029 216.5);
+    --accent: oklch(0.323 0.044 351.6);
+    --accent-foreground: oklch(0.963 0.002 145.6);
+    --destructive: oklch(0.675 0.145 30.1);
+    --destructive-foreground: oklch(0.196 0.017 12.1);
+    --border: oklch(0.963 0.002 145.6 / 10%);
+    --input: oklch(0.963 0.002 145.6 / 20%);
+    --ring: oklch(0.767 0.114 346.4);
+    --teal: oklch(0.64 0.043 218.5);
+    --teal-foreground: oklch(0.81 0.034 215.6);
+    --gold: oklch(0.698 0.123 81.5);
+    --gold-foreground: oklch(0.837 0.104 85.8);
+    --bronze: oklch(0.734 0.058 82.8);
+    --sidebar: oklch(0.222 0.021 13.8);
+    --sidebar-foreground: oklch(0.963 0.002 145.6);
+    --sidebar-primary: oklch(0.433 0.157 353.6);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.323 0.044 351.6);
+    --sidebar-accent-foreground: oklch(0.767 0.114 346.4);
+    --sidebar-border: oklch(0.963 0.002 145.6 / 10%);
+    --sidebar-ring: oklch(0.767 0.114 346.4);
+    color-scheme: dark;
+  }
 }
 
 @layer base {
+  /* Fonts ship with the app so it looks right offline (SIL OFL, see public/fonts). */
+  @font-face { font-family: "Bricolage Grotesque"; src: url("/fonts/bricolage-grotesque.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
+  @font-face { font-family: "Instrument Sans"; src: url("/fonts/instrument-sans.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: "JetBrains Mono"; src: url("/fonts/jetbrains-mono.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
+
   * {
     border-color: var(--color-border);
   }
@@ -143,5 +175,13 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
+  h1, h2, h3 { text-wrap: balance; }
+}
+
+@layer utilities {
+  /* Small uppercase section labels in bronze. */
+  .label-caps { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--bronze); }
+  .tabular { font-variant-numeric: tabular-nums; }
 }
