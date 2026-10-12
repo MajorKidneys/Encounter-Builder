@@ -2,7 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Archive, ArchiveRestore, ChevronLeft, Plus, Square, Trash2 } from "lucide-react";
 import { uid, type Combatant, type Encounter } from "@/lib/encounters";
-import { addCharacterToEncounter, combatantFromCharacter } from "@/lib/characters";
+import {
+  addCharacterToEncounter,
+  combatantFromCharacter,
+  draggedCharacterId,
+  endCharacterDrag,
+} from "@/lib/characters";
 import {
   endCombat,
   hasRolled,
@@ -83,7 +88,8 @@ function Index() {
   });
 
   const takeCharacter = (e: React.DragEvent) => {
-    const id = e.dataTransfer.getData("application/x-dm-character");
+    const id = draggedCharacterId() || e.dataTransfer.getData("text/plain");
+    endCharacterDrag();
     const character = characters.find((c) => c.id === id);
     if (!character) return;
     if (!active) {
@@ -103,7 +109,7 @@ function Index() {
     );
   };
   const allowCharacter = (e: React.DragEvent) => {
-    if (![...e.dataTransfer.types].includes("application/x-dm-character")) return;
+    if (!draggedCharacterId()) return;
     e.preventDefault();
     setDragOver(true);
   };

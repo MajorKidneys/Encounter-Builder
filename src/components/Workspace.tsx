@@ -12,7 +12,13 @@ import {
   Users,
 } from "lucide-react";
 import { uid, type Encounter } from "@/lib/encounters";
-import { identity, makeCharacter, type CharacterRole } from "@/lib/characters";
+import {
+  beginCharacterDrag,
+  endCharacterDrag,
+  identity,
+  makeCharacter,
+  type CharacterRole,
+} from "@/lib/characters";
 import { DEFAULT_CAMPAIGN_NAME, useCampaignStore } from "@/lib/campaigns";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -377,17 +383,30 @@ function CharacterNav({
       <ul className="space-y-1">
         {people.map((c) => (
           <li key={c.id}>
-            <Button
-              variant="ghost"
+            <div
+              role="button"
+              tabIndex={0}
               draggable
-              onDragStart={(e) => e.dataTransfer.setData("application/x-dm-character", c.id)}
+              onDragStart={(e) => {
+                beginCharacterDrag(c.id);
+                e.dataTransfer.setData("text/plain", c.id);
+                e.dataTransfer.effectAllowed = "copy";
+              }}
+              onDragEnd={endCharacterDrag}
               onClick={() => onOpen(c.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") onOpen(c.id);
+              }}
               title={identity(c)}
-              className={cn(navClass, selectedId === c.id ? activeClass : inactiveClass)}
+              className={cn(
+                "cursor-grab",
+                navClass,
+                selectedId === c.id ? activeClass : inactiveClass,
+              )}
               aria-current={selectedId === c.id ? "page" : undefined}
             >
               <span className="min-w-0 truncate">{c.name}</span>
-            </Button>
+            </div>
           </li>
         ))}
       </ul>

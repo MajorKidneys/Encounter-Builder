@@ -1,6 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
-import { identity, longRest, makeCharacter, shortRest, type CharacterRole } from "@/lib/characters";
+import {
+  beginCharacterDrag,
+  endCharacterDrag,
+  identity,
+  longRest,
+  makeCharacter,
+  shortRest,
+  type CharacterRole,
+} from "@/lib/characters";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/Workspace";
 import { CharacterDrawer } from "@/components/party/CharacterDrawer";
@@ -124,18 +132,25 @@ function Roster({
                   selectedId === person.id && "border-primary",
                 )}
               >
-                <button
-                  type="button"
-                  className="min-w-0 flex-1 text-left"
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className="min-w-0 flex-1 cursor-grab text-left"
                   draggable
-                  onDragStart={(e) =>
-                    e.dataTransfer.setData("application/x-dm-character", person.id)
-                  }
+                  onDragStart={(e) => {
+                    beginCharacterDrag(person.id);
+                    e.dataTransfer.setData("text/plain", person.id);
+                    e.dataTransfer.effectAllowed = "copy";
+                  }}
+                  onDragEnd={endCharacterDrag}
                   onClick={() => onOpen(person.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") onOpen(person.id);
+                  }}
                 >
                   <b className="block truncate">{person.name}</b>
                   <span className="text-[12.5px] text-muted-foreground">{identity(person)}</span>
-                </button>
+                </div>
                 <div className="flex shrink-0 gap-2">
                   <Button
                     type="button"

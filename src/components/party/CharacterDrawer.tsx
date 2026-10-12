@@ -45,11 +45,11 @@ export function CharacterDrawer({
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
             <p className="label-caps">{character.role === "npc" ? "NPC" : "Player character"}</p>
-            <Input
+            <input
               aria-label="Name"
               value={character.name}
               onChange={(e) => set({ name: e.target.value })}
-              className="mt-1 h-auto border-transparent px-1 font-display text-[26px] font-bold"
+              className="mt-1 w-full rounded-md border border-transparent bg-transparent px-1 font-display text-[26px] font-bold leading-tight outline-none hover:border-input focus:border-primary focus:bg-card"
             />
             <p className="mt-1 text-[12.5px] text-muted-foreground">{identity(character)}</p>
           </div>

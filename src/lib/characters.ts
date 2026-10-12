@@ -277,6 +277,15 @@ export function combatantFromCharacter(c: Character): Combatant {
   };
 }
 
+let draggedId: string | null = null;
+export const beginCharacterDrag = (id: string) => {
+  draggedId = id;
+};
+export const endCharacterDrag = () => {
+  draggedId = null;
+};
+export const draggedCharacterId = () => draggedId;
+
 export function addCharacterToEncounter(encounter: Encounter, character: Character): Encounter {
   if (encounter.combatants.some((c) => c.characterId === character.id)) return encounter;
   return { ...encounter, combatants: [...encounter.combatants, combatantFromCharacter(character)] };
