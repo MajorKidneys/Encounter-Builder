@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-/** A condition on one copy. `rounds` counts down at the start of that creature's turn; null = until removed. */
+/** A condition on one copy. `rounds` counts down when that creature's turn ends; null = until removed. */
 export type Condition = { id: string; name: string; rounds?: number | null | undefined; level?: number | undefined; note?: string | undefined; expired?: boolean | undefined };
 export type Unit = { id: string; hp: number; conditions?: Condition[] | undefined };
 export type LootItem = { id: string; name: string; taken: boolean; equipmentId?: string; native?: boolean; nativeAction?: import('./monsters').Feature | undefined; bonus?: number | undefined; magicId?: string | undefined; homebrew?: boolean | undefined; desc?: string | undefined; acBonus?: number | undefined; str?: number | undefined };
@@ -33,6 +33,8 @@ export type Encounter = {
   round?: number | undefined;
   /** Combatant whose turn it is. */
   turnId?: string | null | undefined;
+  /** Undo stack for Next, Hold, and Act now. Previous restores the last entry. */
+  turnHistory?: import("./turns").TurnFrame[] | undefined;
 };
 
 const KEY = "dm-encounters-v1";

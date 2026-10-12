@@ -198,7 +198,7 @@ function ConditionPicker({
           </label>
         </div>
         <p className="text-xs text-muted-foreground">
-          Timed conditions count down at the start of {name}'s turn and ask before they're removed.
+          Timed conditions last through that many of {name}'s turns, then ask to be removed.
         </p>
       </PopoverContent>
     </Popover>

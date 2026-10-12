@@ -76,27 +76,203 @@ function resetResources(c: Combatant, kinds: ResetOn[]): Combatant {
   };
 }
 
-/** Start of a creature's turn: timed conditions tick down (and ask before leaving), turn resources refill. */
-function beginTurn(c: Combatant): Combatant {
-  const units = c.units.map((u) => ({
-    ...u,
-    conditions: u.conditions?.map((k) => {
-      if (typeof k.rounds !== "number" || k.expired) return k;
-      const rounds = k.rounds - 1;
-      return rounds <= 0 ? { ...k, rounds: 0, expired: true } : { ...k, rounds };
-    }),
-  }));
-  return resetResources({ ...c, units }, ["turn"]);
-}
+type CondRef = { unitId: string; conditionId: string };
+type ResourceSnap = { resourceId: string; current: number };
+type RoundResourceSnap = { combatantId: string; resourceId: string; current: number };
+
+/** One undoable combat step. Next/Hold push a "step"; Act now pushes an "act". */
+export type TurnFrame =
+  | {
+      type: "step";
+      fromId: string;
+      /** `held` on the creature who just acted, before this step changed it. */
+      fromHeld: boolean;
+      toId: string;
+      prevRound: number;
+      /** Timed conditions on `fromId` that counted down. */
+      decremented: CondRef[];
+      /** Those that hit 0 and asked to be removed. */
+      expired: CondRef[];
+      /** Turn resources on `toId` before they refilled. */
+      turnResources: ResourceSnap[];
+      /** Round resources before a new round refilled them. */
+      roundResources?: RoundResourceSnap[] | undefined;
+    }
+  | {
+      type: "act";
+      id: string;
+      prevTurnId: string | null | undefined;
+      prevInit: number | null;
+      prevHeld: boolean;
+      prevIndex: number;
+    };
 
 function mapC(e: Encounter, id: string, fn: (c: Combatant) => Combatant): Encounter {
   return { ...e, combatants: e.combatants.map((c) => (c.id === id ? fn(c) : c)) };
 }
 
+function remember(e: Encounter, frame: TurnFrame): Encounter {
+  return { ...e, turnHistory: [...(e.turnHistory ?? []), frame] };
+}
+
+/** End of a creature's turn: each timed condition counts down, and a finished one asks to be removed. */
+function endTurn(c: Combatant): {
+  combatant: Combatant;
+  decremented: CondRef[];
+  expired: CondRef[];
+} {
+  const decremented: CondRef[] = [];
+  const expired: CondRef[] = [];
+  const units = c.units.map((u) => ({
+    ...u,
+    conditions: u.conditions?.map((k) => {
+      if (typeof k.rounds !== "number" || k.expired || k.rounds <= 0) return k;
+      decremented.push({ unitId: u.id, conditionId: k.id });
+      const rounds = k.rounds - 1;
+      if (rounds <= 0) {
+        expired.push({ unitId: u.id, conditionId: k.id });
+        return { ...k, rounds: 0, expired: true };
+      }
+      return { ...k, rounds };
+    }),
+  }));
+  return { combatant: { ...c, units }, decremented, expired };
+}
+
+/** Start of a creature's turn: turn resources refill. Durations are counted at the end of the turn. */
+function beginTurn(c: Combatant): { combatant: Combatant; turnResources: ResourceSnap[] } {
+  const turnResources = (c.stats?.resources ?? [])
+    .filter((r) => r.reset === "turn")
+    .map((r) => ({ resourceId: r.id, current: r.current }));
+  return { combatant: resetResources(c, ["turn"]), turnResources };
+}
+
+function mapConditions(c: Combatant, refs: CondRef[], fn: (k: Condition) => Condition): Combatant {
+  if (!refs.length) return c;
+  const byUnit = new Map<string, Set<string>>();
+  for (const ref of refs) {
+    const ids = byUnit.get(ref.unitId) ?? new Set<string>();
+    ids.add(ref.conditionId);
+    byUnit.set(ref.unitId, ids);
+  }
+  return {
+    ...c,
+    units: c.units.map((u) => {
+      const ids = byUnit.get(u.id);
+      if (!ids || !u.conditions) return u;
+      return { ...u, conditions: u.conditions.map((k) => (ids.has(k.id) ? fn(k) : k)) };
+    }),
+  };
+}
+
+function restoreResources(c: Combatant, snaps: ResourceSnap[]): Combatant {
+  if (!c.stats || !snaps.length) return c;
+  const prev = new Map(snaps.map((s) => [s.resourceId, s.current]));
+  return {
+    ...c,
+    stats: {
+      ...c.stats,
+      resources: c.stats.resources.map((r) =>
+        prev.has(r.id) ? { ...r, current: prev.get(r.id)! } : r,
+      ),
+    },
+  };
+}
+
+/** Advance to the next creature who can act, remembering enough to undo this step. */
+function advance(e: Encounter, fromHeld: boolean): Encounter {
+  const current = e.combatants.find((c) => c.id === e.turnId);
+  if (!current) return e;
+  const order = turnOrder(e.combatants);
+  const fromIdx = order.findIndex((c) => c.id === current.id);
+  for (let s = 1; s <= order.length; s++) {
+    const j = (fromIdx + s) % order.length;
+    const candidate = order[j];
+    if (!candidate || !canAct(candidate)) continue;
+
+    const ended = endTurn(current);
+    let combatants = e.combatants.map((c) => (c.id === current.id ? ended.combatant : c));
+    const prevRound = e.round ?? 1;
+    const wrapped = j <= fromIdx;
+    let round = prevRound;
+    let roundResources: RoundResourceSnap[] | undefined;
+    if (wrapped) {
+      round = prevRound + 1;
+      roundResources = combatants.flatMap((c) =>
+        (c.stats?.resources ?? [])
+          .filter((r) => r.reset === "round")
+          .map((r) => ({ combatantId: c.id, resourceId: r.id, current: r.current })),
+      );
+      combatants = combatants.map((c) => resetResources(c, ["round"]));
+    }
+    const target = combatants.find((c) => c.id === candidate.id) ?? candidate;
+    const begun = beginTurn(target);
+    combatants = combatants.map((c) => (c.id === target.id ? begun.combatant : c));
+    return remember(
+      { ...e, combatants, round, turnId: target.id },
+      {
+        type: "step",
+        fromId: current.id,
+        fromHeld,
+        toId: target.id,
+        prevRound,
+        decremented: ended.decremented,
+        expired: ended.expired,
+        turnResources: begun.turnResources,
+        ...(roundResources?.length ? { roundResources } : {}),
+      },
+    );
+  }
+  return e;
+}
+
+function undoStep(e: Encounter, frame: Extract<TurnFrame, { type: "step" }>): Encounter {
+  const roundSnaps = new Map<string, ResourceSnap[]>();
+  for (const snap of frame.roundResources ?? []) {
+    const list = roundSnaps.get(snap.combatantId) ?? [];
+    list.push({ resourceId: snap.resourceId, current: snap.current });
+    roundSnaps.set(snap.combatantId, list);
+  }
+  const combatants = e.combatants.map((c) => {
+    let next = c;
+    if (c.id === frame.toId) next = restoreResources(next, frame.turnResources);
+    const rounds = roundSnaps.get(c.id);
+    if (rounds) next = restoreResources(next, rounds);
+    if (c.id === frame.fromId) {
+      next = { ...next, held: frame.fromHeld };
+      next = mapConditions(next, frame.decremented, (k) =>
+        typeof k.rounds === "number" ? { ...k, rounds: k.rounds + 1 } : k,
+      );
+      next = mapConditions(next, frame.expired, (k) => (k.expired ? { ...k, expired: false } : k));
+    }
+    return next;
+  });
+  return { ...e, combatants, turnId: frame.fromId, round: frame.prevRound };
+}
+
+function undoAct(e: Encounter, frame: Extract<TurnFrame, { type: "act" }>): Encounter {
+  const index = e.combatants.findIndex((c) => c.id === frame.id);
+  const me = e.combatants[index];
+  if (!me) return { ...e, turnId: frame.prevTurnId };
+  const restored = { ...me, held: frame.prevHeld, init: frame.prevInit };
+  const rest = e.combatants.filter((c) => c.id !== frame.id);
+  const at = Math.max(0, Math.min(frame.prevIndex, rest.length));
+  return {
+    ...e,
+    turnId: frame.prevTurnId,
+    combatants: [...rest.slice(0, at), restored, ...rest.slice(at)],
+  };
+}
+
 export function startCombat(e: Encounter): Encounter {
   const first = turnOrder(e.combatants).find(canAct);
   if (!first) return e;
-  return mapC({ ...e, round: 1, turnId: first.id }, first.id, beginTurn);
+  const begun = beginTurn(first);
+  return mapC(
+    { ...e, round: 1, turnId: first.id, turnHistory: [] },
+    first.id,
+    () => begun.combatant,
+  );
 }
 
 export function endCombat(e: Encounter): Encounter {
@@ -104,67 +280,76 @@ export function endCombat(e: Encounter): Encounter {
     ...e,
     round: 0,
     turnId: null,
+    turnHistory: [],
     combatants: e.combatants.map((c) => (c.held ? { ...c, held: false } : c)),
   };
 }
 
 export function nextTurn(e: Encounter): Encounter {
   if (!isLive(e)) return startCombat(e);
-  const order = turnOrder(e.combatants);
-  const from = order.findIndex((c) => c.id === e.turnId);
-  for (let s = 1; s <= order.length; s++) {
-    const j = (from + s) % order.length;
-    const c = order[j]!;
-    if (!canAct(c)) continue;
-    const wrapped = j <= from;
-    let next: Encounter = { ...e, turnId: c.id };
-    if (wrapped)
-      next = {
-        ...next,
-        round: (e.round ?? 1) + 1,
-        combatants: next.combatants.map((x) => resetResources(x, ["round"])),
-      };
-    return mapC(next, c.id, beginTurn);
-  }
-  return e;
+  const current = e.combatants.find((c) => c.id === e.turnId);
+  if (!current) return e;
+  return advance(e, !!current.held);
 }
 
 export function prevTurn(e: Encounter): Encounter {
   if (!isLive(e)) return e;
-  const order = turnOrder(e.combatants);
-  const from = order.findIndex((c) => c.id === e.turnId);
-  for (let s = 1; s <= order.length; s++) {
-    const j = (((from - s) % order.length) + order.length) % order.length;
-    const c = order[j]!;
-    if (!canAct(c)) continue;
-    const wrapped = j >= from;
-    return { ...e, turnId: c.id, round: wrapped ? Math.max(1, (e.round ?? 1) - 1) : e.round };
-  }
-  return e;
+  const history = e.turnHistory ?? [];
+  const frame = history[history.length - 1];
+  if (!frame) return e;
+  const rest = { ...e, turnHistory: history.slice(0, -1) };
+  return frame.type === "act" ? undoAct(rest, frame) : undoStep(rest, frame);
 }
 
 /** The active creature delays: it leaves the rotation until it chooses to act. */
 export function holdTurn(e: Encounter): Encounter {
   if (!isLive(e) || !e.turnId) return e;
-  return nextTurn(mapC(e, e.turnId, (c) => ({ ...c, held: true })));
+  const id = e.turnId;
+  const wasHeld = !!e.combatants.find((c) => c.id === id)?.held;
+  return advance(
+    mapC(e, id, (c) => ({ ...c, held: true })),
+    wasHeld,
+  );
 }
 
 /** A held creature acts now: it takes the current initiative, slots in just before whoever is up, and becomes active. */
 export function actNow(e: Encounter, id: string): Encounter {
-  const me = e.combatants.find((c) => c.id === id);
+  const prevIndex = e.combatants.findIndex((c) => c.id === id);
+  const me = e.combatants[prevIndex];
   const cur = e.combatants.find((c) => c.id === e.turnId);
   if (!me) return e;
-  if (!cur || cur.id === id) return { ...mapC(e, id, (c) => ({ ...c, held: false })), turnId: id };
-  const moved = { ...me, held: false, init: cur.init };
-  const rest = e.combatants.filter((c) => c.id !== id);
-  const at = rest.findIndex((c) => c.id === cur.id);
-  return { ...e, turnId: id, combatants: [...rest.slice(0, at), moved, ...rest.slice(at)] };
+  const frame: TurnFrame = {
+    type: "act",
+    id,
+    prevTurnId: e.turnId,
+    prevInit: me.init,
+    prevHeld: !!me.held,
+    prevIndex,
+  };
+  const moved =
+    !cur || cur.id === id
+      ? { ...mapC(e, id, (c) => ({ ...c, held: false })), turnId: id }
+      : (() => {
+          const nextMe = { ...me, held: false, init: cur.init };
+          const rest = e.combatants.filter((c) => c.id !== id);
+          const at = rest.findIndex((c) => c.id === cur.id);
+          return {
+            ...e,
+            turnId: id,
+            combatants: [...rest.slice(0, at), nextMe, ...rest.slice(at)],
+          };
+        })();
+  return remember(moved, frame);
 }
 
-/** Removing the active creature hands the turn on first. */
+/** Removing the active creature hands the turn on first. Rewind stops at the removal. */
 export function removeCombatant(e: Encounter, id: string): Encounter {
   const handed = e.turnId === id && isLive(e) ? nextTurn(e) : e;
-  const out = { ...handed, combatants: handed.combatants.filter((c) => c.id !== id) };
+  const out = {
+    ...handed,
+    turnHistory: [],
+    combatants: handed.combatants.filter((c) => c.id !== id),
+  };
   return out.turnId === id ? { ...out, turnId: null, round: 0 } : out;
 }
 

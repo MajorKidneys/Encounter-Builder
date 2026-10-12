@@ -51,15 +51,71 @@ describe("turn order", () => {
     expect([e.round, e.turnId]).toEqual([1, "b"]);
   });
 
-  it("counts timed conditions down at the start of that creature's turn and asks when they end", () => {
+  it("lets a 1-round condition last through that creature's turn", () => {
     const a = mk("a", 15);
     a.units[0]!.conditions = [{ id: "k", name: "Frightened", rounds: 1 }];
     let e = startCombat(enc([mk("b", 20), a]));
+    e = nextTurn(e);
+    expect(e.turnId).toBe("a");
+    expect(e.combatants.find((c) => c.id === "a")!.units[0]!.conditions![0]).toMatchObject({
+      rounds: 1,
+    });
     e = nextTurn(e);
     expect(e.combatants.find((c) => c.id === "a")!.units[0]!.conditions![0]).toMatchObject({
       rounds: 0,
       expired: true,
     });
+    e = prevTurn(e);
+    expect(e.turnId).toBe("a");
+    expect(e.combatants.find((c) => c.id === "a")!.units[0]!.conditions![0]).toMatchObject({
+      rounds: 1,
+    });
+    expect(e.combatants.find((c) => c.id === "a")!.units[0]!.conditions![0]!.expired).toBeFalsy();
+  });
+
+  it("does nothing on the opening turn", () => {
+    const e = startCombat(enc([mk("a", 15), mk("b", 3)]));
+    expect(prevTurn(e)).toBe(e);
+  });
+
+  it("rewinds a round without ticking conditions twice or keeping refilled resources", () => {
+    const stats = {
+      ...blankStats("x"),
+      resources: [
+        { id: "t", name: "Reaction", max: 1, current: 0, reset: "turn" as const },
+        { id: "r", name: "Legendary", max: 3, current: 1, reset: "round" as const },
+      ],
+    };
+    const a = mk("a", 15, { stats, units: [{ id: "u", hp: 8 }] });
+    a.units[0]!.conditions = [{ id: "k", name: "Frightened", rounds: 2 }];
+    let e = startCombat(enc([a, mk("b", 10)]));
+    e = {
+      ...e,
+      combatants: e.combatants.map((c) =>
+        c.id !== "a"
+          ? c
+          : {
+              ...c,
+              stats: {
+                ...c.stats!,
+                resources: c.stats!.resources.map((r) => (r.id === "t" ? { ...r, current: 0 } : r)),
+              },
+            },
+      ),
+    };
+    e = nextTurn(nextTurn(e));
+    expect([e.round, e.turnId]).toEqual([2, "a"]);
+    expect(e.combatants[0]!.stats!.resources.map((r) => r.current)).toEqual([1, 3]);
+    e = prevTurn(e);
+    expect([e.round, e.turnId]).toEqual([1, "b"]);
+    expect(e.combatants[0]!.stats!.resources.map((r) => r.current)).toEqual([0, 1]);
+    expect(e.combatants[0]!.units[0]).toMatchObject({ hp: 8 });
+    expect(e.combatants[0]!.units[0]!.conditions![0]).toMatchObject({ rounds: 1 });
+    e = nextTurn(e);
+    expect([e.round, e.turnId]).toEqual([2, "a"]);
+    expect(e.combatants[0]!.stats!.resources.map((r) => r.current)).toEqual([1, 3]);
+    expect(e.combatants[0]!.units[0]!.conditions![0]).toMatchObject({ rounds: 1 });
+    expect(e.combatants[0]!.units[0]!.conditions![0]!.expired).toBeFalsy();
   });
 
   it("refills turn resources on the creature's turn and round resources each new round", () => {
@@ -85,8 +141,22 @@ describe("turn order", () => {
     e = actNow(e, "a");
     expect(e.turnId).toBe("a");
     expect(turnOrder(e.combatants).map((c) => c.id)).toEqual(["b", "a", "c"]);
+    e = prevTurn(e);
+    expect(e.turnId).toBe("c");
+    expect(e.combatants.find((c) => c.id === "a")).toMatchObject({ init: 20, held: true });
+    expect(turnOrder(e.combatants).map((c) => c.id)).toEqual(["a", "b", "c"]);
+    e = actNow(e, "a");
     e = nextTurn(e);
     expect(e.turnId).toBe("c");
+  });
+
+  it("releases a held turn when rewound", () => {
+    let e = holdTurn(startCombat(enc([mk("a", 20), mk("b", 15)])));
+    expect(e.turnId).toBe("b");
+    expect(e.combatants.find((c) => c.id === "a")!.held).toBe(true);
+    e = prevTurn(e);
+    expect(e.turnId).toBe("a");
+    expect(e.combatants.find((c) => c.id === "a")!.held).toBeFalsy();
   });
 
   it("hands the turn on when the active creature is removed", () => {
