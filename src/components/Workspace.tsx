@@ -9,8 +9,10 @@ import {
   Plus,
   Swords,
   Trash2,
+  Users,
 } from "lucide-react";
 import { uid, type Encounter } from "@/lib/encounters";
+import { identity, makeCharacter, type CharacterRole } from "@/lib/characters";
 import { DEFAULT_CAMPAIGN_NAME, useCampaignStore } from "@/lib/campaigns";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,7 +41,9 @@ export function Workspace({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useRouterState({ select: (s) => s.location });
   const isSpells = location.pathname === "/spells";
+  const isParty = location.pathname === "/party";
   const selectedList = (location.search as { list?: string }).list;
+  const selectedCharacter = (location.search as { id?: string }).id;
   const active = campaigns.encounters.find((e) => e.id === activeId) ?? campaigns.encounters[0];
 
   useEffect(() => {
@@ -49,14 +53,15 @@ export function Workspace({ children }: { children: ReactNode }) {
     setRenameArmed(false);
   }, [renameArmed, campaigns.ready, campaigns.campaignId]);
 
-  const leaveSpellList = () => {
+  const leaveScopedPage = () => {
     if (isSpells) void navigate({ to: "/spells", search: {} });
+    if (isParty) void navigate({ to: "/party", search: {} });
   };
   const chooseCampaign = (id: string) => {
     if (id === campaigns.campaignId) return;
     campaigns.selectCampaign(id);
     setActiveId(null);
-    leaveSpellList();
+    leaveScopedPage();
   };
   const createCampaign = () => {
     const created = campaigns.createCampaign();
@@ -76,7 +81,7 @@ export function Workspace({ children }: { children: ReactNode }) {
       return;
     campaigns.deleteCampaign(current.id);
     setActiveId(null);
-    leaveSpellList();
+    leaveScopedPage();
   };
   const newEncounter = () => {
     const encounter: Encounter = {
@@ -89,6 +94,11 @@ export function Workspace({ children }: { children: ReactNode }) {
     campaigns.setEncounters((all) => [...all, encounter]);
     setActiveId(encounter.id);
     void navigate({ to: "/" });
+  };
+  const addCharacter = (role: CharacterRole) => {
+    const created = makeCharacter(role);
+    campaigns.setCharacters((all) => [...all, created]);
+    void navigate({ to: "/party", search: { id: created.id } });
   };
   const newFavorite = () => {
     const id = uid();
@@ -288,6 +298,28 @@ export function Workspace({ children }: { children: ReactNode }) {
               >
                 <Plus /> New list
               </Button>
+              <CharacterNav
+                title="Party"
+                people={campaigns.characters.filter((c) => c.role === "pc")}
+                selectedId={isParty ? selectedCharacter : undefined}
+                activeClass={activeClass}
+                inactiveClass={inactiveClass}
+                navClass={navClass}
+                onOpen={(id) => void navigate({ to: "/party", search: { id } })}
+                onAdd={() => addCharacter("pc")}
+                addLabel="New character"
+              />
+              <CharacterNav
+                title="NPCs"
+                people={campaigns.characters.filter((c) => c.role === "npc")}
+                selectedId={isParty ? selectedCharacter : undefined}
+                activeClass={activeClass}
+                inactiveClass={inactiveClass}
+                navClass={navClass}
+                onOpen={(id) => void navigate({ to: "/party", search: { id } })}
+                onAdd={() => addCharacter("npc")}
+                addLabel="New NPC"
+              />
             </nav>
           ) : (
             <nav className="flex flex-col items-center gap-2 py-3">
@@ -301,6 +333,11 @@ export function Workspace({ children }: { children: ReactNode }) {
                   <BookOpen />
                 </Link>
               </Button>
+              <Button asChild variant="ghost" size="icon" title="Party">
+                <Link to="/party" search={{}} aria-label="Party">
+                  <Users />
+                </Link>
+              </Button>
             </nav>
           )}
         </aside>
@@ -310,5 +347,57 @@ export function Workspace({ children }: { children: ReactNode }) {
       </div>
       <Toaster position="bottom-right" />
     </WorkspaceContext.Provider>
+  );
+}
+
+function CharacterNav({
+  title,
+  people,
+  selectedId,
+  activeClass,
+  inactiveClass,
+  navClass,
+  onOpen,
+  onAdd,
+  addLabel,
+}: {
+  title: string;
+  people: { id: string; name: string; race: string; classes: string }[];
+  selectedId: string | undefined;
+  activeClass: string;
+  inactiveClass: string;
+  navClass: string;
+  onOpen: (id: string) => void;
+  onAdd: () => void;
+  addLabel: string;
+}) {
+  return (
+    <>
+      <h2 className="label-caps mb-1.5 mt-6 px-2.5">{title}</h2>
+      <ul className="space-y-1">
+        {people.map((c) => (
+          <li key={c.id}>
+            <Button
+              variant="ghost"
+              draggable
+              onDragStart={(e) => e.dataTransfer.setData("application/x-dm-character", c.id)}
+              onClick={() => onOpen(c.id)}
+              title={identity(c)}
+              className={cn(navClass, selectedId === c.id ? activeClass : inactiveClass)}
+              aria-current={selectedId === c.id ? "page" : undefined}
+            >
+              <span className="min-w-0 truncate">{c.name}</span>
+            </Button>
+          </li>
+        ))}
+      </ul>
+      <Button
+        variant="ghost"
+        className="mt-1 w-full justify-start px-2.5 font-normal text-muted-foreground"
+        onClick={onAdd}
+      >
+        <Plus /> {addLabel}
+      </Button>
+    </>
   );
 }

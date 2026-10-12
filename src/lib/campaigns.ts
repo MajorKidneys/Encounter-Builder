@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { uid, type Encounter } from "./encounters";
-import { type PlayerCharacter } from "./characters";
+import { coerceCharacter, type Character } from "./characters";
 import { type SpellList } from "./spells";
 
 /** Directory of campaigns. Encounter, spell-list, and party data live in per-campaign keys. */
@@ -14,7 +14,7 @@ export type CampaignMeta = { id: string; name: string; createdAt: number };
 export type CampaignData = {
   encounters: Encounter[];
   spellLists: SpellList[];
-  characters: PlayerCharacter[];
+  characters: Character[];
 };
 export type CampaignStore = {
   activeId: string;
@@ -61,8 +61,9 @@ function readData(storage: Storage, id: string): CampaignData {
   const encounters = asArray<Encounter>(readJson(storage, campaignDataKey(id, "encounters"))) ?? [];
   const spellLists =
     asArray<SpellList>(readJson(storage, campaignDataKey(id, "spell-lists"))) ?? emptySpellLists();
-  const characters =
-    asArray<PlayerCharacter>(readJson(storage, campaignDataKey(id, "characters"))) ?? [];
+  const characters = (asArray<unknown>(readJson(storage, campaignDataKey(id, "characters"))) ?? [])
+    .map(coerceCharacter)
+    .filter((c): c is Character => c !== null);
   return { encounters, spellLists, characters };
 }
 

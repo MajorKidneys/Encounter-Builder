@@ -11,6 +11,7 @@ import {
   useCampaignStore,
 } from "./campaigns";
 import { renderHook, act, waitFor } from "@testing-library/react";
+import { makeCharacter } from "./characters";
 
 const encounter = { id: "e1", name: "Death House", archived: false, createdAt: 1, combatants: [] };
 
@@ -55,9 +56,7 @@ describe("campaign storage", () => {
     const testingId = second.activeId;
     const homeId = first.activeId;
     second.data[homeId]!.encounters = [encounter];
-    second.data[homeId]!.characters = [
-      { id: "pc1", name: "Nyx", maxHp: 27, notes: "Aasimar cleric" },
-    ];
+    second.data[homeId]!.characters = [{ ...makeCharacter("pc", "Nyx"), id: "pc1", maxHp: 27 }];
     second.data[testingId]!.spellLists = [{ id: "t1", name: "Scratch", spellIds: [] }];
     saveCampaignStore(localStorage, second);
 
@@ -102,7 +101,9 @@ describe("useCampaignStore", () => {
 
     act(() => result.current.renameCampaign("Home game"));
     act(() => result.current.setEncounters([encounter]));
-    act(() => result.current.setCharacters([{ id: "pc1", name: "Nyx", maxHp: 27, notes: "" }]));
+    act(() =>
+      result.current.setCharacters([{ ...makeCharacter("pc", "Nyx"), id: "pc1", maxHp: 27 }]),
+    );
     let testing = "";
     act(() => {
       testing = result.current.createCampaign()?.id ?? "";
