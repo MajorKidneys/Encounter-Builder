@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 /** A condition on one copy. `rounds` counts down when that creature's turn ends; null = until removed. */
 export type Condition = { id: string; name: string; rounds?: number | null | undefined; level?: number | undefined; note?: string | undefined; expired?: boolean | undefined };
 export type Unit = { id: string; hp: number; conditions?: Condition[] | undefined };
@@ -19,6 +17,8 @@ export type Combatant = {
   loot: LootItem[];
   currency: Currency;
   notes: string;
+  /** Set when this row was added from the campaign's saved party. The row is a copy. */
+  characterId?: string | undefined;
   stats?: import("./monsters").MonsterStats | undefined;
   gearVersion?: number;
   gearAc?: number;
@@ -37,7 +37,6 @@ export type Encounter = {
   turnHistory?: import("./turns").TurnFrame[] | undefined;
 };
 
-const KEY = "dm-encounters-v1";
 export const uid = () => Math.random().toString(36).slice(2, 10);
 
 export function makeUnits(qty: number, hp: number | null): Unit[] {
@@ -46,22 +45,4 @@ export function makeUnits(qty: number, hp: number | null): Unit[] {
 
 export function lootTotalGp(c: Currency) {
   return c.cp / 100 + c.sp / 10 + c.gp + c.pp * 10;
-}
-
-export function useEncounters() {
-  const [encounters, setEncounters] = useState<Encounter[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setEncounters(JSON.parse(raw));
-    } catch {
-      /* ignore */
-    }
-    setLoaded(true);
-  }, []);
-  useEffect(() => {
-    if (loaded) localStorage.setItem(KEY, JSON.stringify(encounters));
-  }, [encounters, loaded]);
-  return { encounters, setEncounters, loaded };
 }

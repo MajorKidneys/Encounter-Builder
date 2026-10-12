@@ -9,8 +9,9 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Encounter data lives in browser localStorage via `src/lib/encounters.ts` (no backend in V1 by user request).
-- The root Workspace owns encounter and spell-list state and the shared sidebar; leaf routes render only their panes so navigation preserves selection and avoids competing localStorage writers.
+- Encounter data lives in browser localStorage (no backend in V1 by user request). Each campaign is its own slice: `dm-campaigns-v2` holds the directory and active id, and `dm-c-<id>-encounters`, `dm-c-<id>-spell-lists`, and `dm-c-<id>-characters` hold that campaign's data. The sidebar campaign selector is the only switch; pages read the active campaign. Legacy `dm-encounters-v1`, `dm-spell-lists-v1`, and `dm-campaign-name-v1` migrate once into the first campaign and stay on disk as a backup. Drawer section prefs stay global in `dm-drawer-sections-v1`.
+- Saved player characters live on the campaign (`src/lib/characters.ts`) so a later party list under Spells can add them to encounters without another migration. A row copied into an encounter keeps `characterId` and does not write back.
+- The root Workspace owns campaign, encounter, and spell-list state and the shared sidebar; leaf routes render only their panes so navigation preserves selection and avoids competing localStorage writers.
 
 - Monster library is static JSON lazy-loaded via `src/lib/monsters.ts`: `src/data/srd-monsters.json` (SRD 5.1, CC-BY-4.0) plus `src/data/a5e-monsters.json` (EN Publishing Monstrous Menagerie, OGL 1.0a, from Open5e document key `a5e-mm`; A5E entries carry `source: "Monstrous Menagerie"` and `srd: false`). Imported/edited stats live on the combatant in localStorage — keeps the bundle small and library read-only. Kobold Press books were deliberately excluded (user balance concern).
 

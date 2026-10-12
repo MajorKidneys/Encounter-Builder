@@ -38,7 +38,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { encounters, setEncounters, activeId, setActiveId, newEncounter } = useWorkspace();
+  const { encounters, setEncounters, activeId, setActiveId, newEncounter, ready } = useWorkspace();
   const [drawerId, setDrawerId] = useState<string | null>(null);
 
   // Close the drawer when clicking anywhere outside of it.
@@ -77,6 +77,8 @@ function Index() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
+
+  if (!ready) return <main className="min-w-0 flex-1" />;
 
   if (!active) {
     return (
