@@ -9,7 +9,7 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Encounter data lives in browser localStorage via `src/lib/encounters.ts` (no backend in V1 by user request).
+- Saved data (encounters, spell lists, campaign name) goes through `src/lib/store.ts` (`usePersistedState`). In the Electron app the source of truth is one JSON file, `~/Library/Application Support/Encounter Tracker/data.json` (`electron/store.cjs`, exposed to the page by `electron/preload.cjs`; `ENCOUNTER_TRACKER_DATA_DIR` overrides the folder), so the Claude connector can read and write the same data. Every write is also mirrored to localStorage as a backup and as the store for the plain-browser version; a missing file is rebuilt from that backup. The file is `{ version, keys: { "dm-...": value } }` using the same keys as localStorage, and edits made outside the app show up live. Viewing preferences (drawer sections) stay in localStorage only. `ENCOUNTER_TRACKER_PORT` overrides the app's local port for testing alongside an installed copy. No backend in V1 by user request.
 - The root Workspace owns encounter and spell-list state and the shared sidebar; leaf routes render only their panes so navigation preserves selection and avoids competing localStorage writers.
 
 - Monster library is static JSON lazy-loaded via `src/lib/monsters.ts`: `src/data/srd-monsters.json` (SRD 5.1, CC-BY-4.0) plus `src/data/a5e-monsters.json` (EN Publishing Monstrous Menagerie, OGL 1.0a, from Open5e document key `a5e-mm`; A5E entries carry `source: "Monstrous Menagerie"` and `srd: false`). Imported/edited stats live on the combatant in localStorage — keeps the bundle small and library read-only. Kobold Press books were deliberately excluded (user balance concern).

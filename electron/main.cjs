@@ -1,14 +1,41 @@
-const { app, BrowserWindow, nativeTheme, shell } = require("electron");
+const { app, BrowserWindow, ipcMain, nativeTheme, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const http = require("http");
+const { createStore } = require("./store.cjs");
 
 // Serve the built site from a tiny local web server bound to this Mac only.
 // file:// blocks the app's script modules, and a fixed address keeps the
 // saved data (encounters, spell lists) in the same place between launches.
-const PORT = 47615;
+const PORT = Number(process.env.ENCOUNTER_TRACKER_PORT) || 47615;
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 const ROOT = path.join(__dirname, "..", "dist", "client");
+
+// All saved data lives in one file the Claude connector can read too. The folder is fixed
+// (not Electron's userData) so renaming the app never moves it. ENCOUNTER_TRACKER_DATA_DIR overrides it.
+const DATA_DIR = process.env.ENCOUNTER_TRACKER_DATA_DIR || path.join(app.getPath("appData"), "Encounter Tracker");
+const store = createStore(DATA_DIR);
+
+// Only pages served by this app may use the store, and only for the tracker's own "dm-" keys.
+const trusted = (event) => (event.senderFrame?.url || "").startsWith(ORIGIN);
+const validKey = (key) => typeof key === "string" && key.startsWith("dm-") && key.length < 200;
+function broadcast(changes, except) {
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (win.webContents !== except) win.webContents.send("store:changed", changes);
+  }
+}
+ipcMain.handle("store:getAll", (event) => (trusted(event) ? store.getAll() : {}));
+ipcMain.handle("store:set", (event, key, value) => {
+  if (!trusted(event) || !validKey(key)) return;
+  store.set(key, value);
+  broadcast([{ key, value }], event.sender);
+});
+ipcMain.handle("store:remove", (event, key) => {
+  if (!trusted(event) || !validKey(key)) return;
+  store.remove(key);
+  broadcast([{ key, value: undefined }], event.sender);
+});
+store.onExternalChange((changes) => broadcast(changes, null));
 
 const TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -60,6 +87,7 @@ function createWindow(url = ORIGIN + "/") {
     // Match the app background so launch doesn't flash a different color.
     backgroundColor: nativeTheme.shouldUseDarkColors ? "#2c1c1d" : "#f2f3f2",
     webPreferences: {
+      preload: path.join(__dirname, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -92,6 +120,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.whenReady().then(async () => {
+    store.watch();
     await startServer();
     createWindow();
     app.on("activate", () => {

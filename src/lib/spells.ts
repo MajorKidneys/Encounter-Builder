@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { uid } from "./encounters";
+import { usePersistedState } from "./store";
 
 export type Spell = {
   id: string; name: string; level: number; school: string; classes: string[];
@@ -51,19 +52,9 @@ export const levelLabel = (l: number) => (l === 0 ? "Cantrips" : `${l}${["st", "
 export type SpellList = { id: string; name: string; spellIds: string[] };
 const KEY = "dm-spell-lists-v1";
 export function useSpellLists() {
-  const [lists, setLists] = useState<SpellList[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      setLists(raw ? JSON.parse(raw) : [{ id: uid(), name: "Favorites", spellIds: [] }]);
-    } catch {
-      setLists([{ id: uid(), name: "Favorites", spellIds: [] }]);
-    }
-    setLoaded(true);
-  }, []);
-  useEffect(() => {
-    if (loaded) localStorage.setItem(KEY, JSON.stringify(lists));
-  }, [lists, loaded]);
+  const [lists, setLists] = usePersistedState<SpellList[]>(KEY, [], {
+    isValid: Array.isArray,
+    fallback: () => [{ id: uid(), name: "Favorites", spellIds: [] }],
+  });
   return { lists, setLists };
 }

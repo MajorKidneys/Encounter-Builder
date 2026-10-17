@@ -1,8 +1,9 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Archive, BookOpen, Bookmark, PanelLeftClose, PanelLeftOpen, Plus, Swords } from "lucide-react";
 import { useEncounters, uid, type Encounter } from "@/lib/encounters";
 import { useSpellLists } from "@/lib/spells";
+import { usePersistedState } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -26,19 +27,9 @@ export function Workspace({ children }: { children: ReactNode }) {
   const spellListsState = useSpellLists();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [open, setOpen] = useState(true);
-  const [campaignName, setCampaignName] = useState("YOUR ADVENTURE");
-  const [campaignLoaded, setCampaignLoaded] = useState(false);
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("dm-campaign-name-v1");
-      if (saved?.trim()) setCampaignName(saved);
-    } catch { /* Keep the default when storage is unavailable. */ }
-    setCampaignLoaded(true);
-  }, []);
-  useEffect(() => {
-    if (!campaignLoaded) return;
-    try { localStorage.setItem("dm-campaign-name-v1", campaignName); } catch { /* Storage may be unavailable. */ }
-  }, [campaignName, campaignLoaded]);
+  const [campaignName, setCampaignName] = usePersistedState<string>("dm-campaign-name-v1", "YOUR ADVENTURE", {
+    isValid: (v) => typeof v === "string" && v.trim() !== "",
+  });
   const navigate = useNavigate();
   const location = useRouterState({ select: (s) => s.location });
   const isSpells = location.pathname === "/spells";

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { usePersistedState } from "./store";
 
 /** A condition on one copy. `rounds` counts down when that creature's turn ends; null = until removed. */
 export type Condition = { id: string; name: string; rounds?: number | null | undefined; level?: number | undefined; note?: string | undefined; expired?: boolean | undefined };
@@ -49,19 +49,6 @@ export function lootTotalGp(c: Currency) {
 }
 
 export function useEncounters() {
-  const [encounters, setEncounters] = useState<Encounter[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setEncounters(JSON.parse(raw));
-    } catch {
-      /* ignore */
-    }
-    setLoaded(true);
-  }, []);
-  useEffect(() => {
-    if (loaded) localStorage.setItem(KEY, JSON.stringify(encounters));
-  }, [encounters, loaded]);
+  const [encounters, setEncounters, loaded] = usePersistedState<Encounter[]>(KEY, [], { isValid: Array.isArray });
   return { encounters, setEncounters, loaded };
 }
