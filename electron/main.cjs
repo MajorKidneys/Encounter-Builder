@@ -120,6 +120,8 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.whenReady().then(async () => {
+    // macOS takes the Dock icon from the app bundle, so a run straight from the repo needs it set here.
+    if (process.platform === "darwin") app.dock?.setIcon(path.join(__dirname, "icon", "icon.png"));
     store.watch();
     await startServer();
     createWindow();
