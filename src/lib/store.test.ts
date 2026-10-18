@@ -3,7 +3,15 @@ import { mkdtempSync, readFileSync, writeFileSync, readdirSync, existsSync } fro
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { readKey, resetStoreForTests, storageReady, writeKey, subscribeKey } from "./store";
+import {
+  readKey,
+  resetStoreForTests,
+  storageReady,
+  writeKey,
+  subscribeKey,
+  subscribeAny,
+  storeAdapter,
+} from "./store";
 
 const { createStore } = createRequire(import.meta.url)("../../electron/store.cjs") as {
   createStore: (dir: string) => {
@@ -151,5 +159,30 @@ describe("renderer store", () => {
     localStorage.setItem("dm-x", JSON.stringify([7]));
     await storageReady();
     expect(readKey("dm-x")).toEqual([7]);
+  });
+
+  it("storeAdapter acts like localStorage: JSON in and out, bare text stays text, removals stick", async () => {
+    const { file } = fakeBridge({});
+    await storageReady();
+    storeAdapter.setItem("dm-c-1-encounters", JSON.stringify([{ id: "a" }]));
+    expect(JSON.parse(storeAdapter.getItem("dm-c-1-encounters")!)).toEqual([{ id: "a" }]);
+    localStorage.setItem("dm-campaign-name-v1", "My Game");
+    expect(storeAdapter.getItem("dm-campaign-name-v1")).toBe("My Game");
+    expect(storeAdapter.getItem("dm-missing")).toBeNull();
+    await Promise.resolve();
+    expect(file["dm-c-1-encounters"]).toEqual([{ id: "a" }]);
+    storeAdapter.removeItem("dm-c-1-encounters");
+    await Promise.resolve();
+    expect(file["dm-c-1-encounters"]).toBeUndefined();
+    expect(localStorage.getItem("dm-c-1-encounters")).toBeNull();
+  });
+
+  it("subscribeAny hears outside changes", async () => {
+    const { push } = fakeBridge({});
+    await storageReady();
+    const heard: string[] = [];
+    subscribeAny((k) => heard.push(k));
+    push([{ key: "dm-c-9-encounters", value: [] }]);
+    expect(heard).toEqual(["dm-c-9-encounters"]);
   });
 });

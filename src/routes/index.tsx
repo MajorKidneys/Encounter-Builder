@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Archive, ArchiveRestore, ChevronLeft, Plus, Square, Trash2 } from "lucide-react";
-import { type Combatant, type Encounter } from "@/lib/encounters";
+import { uid, type Combatant, type Encounter } from "@/lib/encounters";
+import {
+  addCharacterToEncounter,
+  combatantFromCharacter,
+  draggedCharacterId,
+  endCharacterDrag,
+} from "@/lib/characters";
 import {
   endCombat,
   hasRolled,
@@ -16,6 +22,7 @@ import { useWorkspace } from "@/components/Workspace";
 import { InitiativeList } from "@/components/encounter/InitiativeList";
 import { AddCombatant } from "@/components/encounter/AddCombatant";
 import { CreatureDrawer } from "@/components/encounter/CreatureDrawer";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,8 +45,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { encounters, setEncounters, activeId, setActiveId, newEncounter } = useWorkspace();
+  const { encounters, setEncounters, activeId, setActiveId, newEncounter, ready, characters } =
+    useWorkspace();
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
 
   // Close the drawer when clicking anywhere outside of it.
   useEffect(() => {
@@ -78,9 +87,50 @@ function Index() {
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  const takeCharacter = (e: React.DragEvent) => {
+    const id = draggedCharacterId() || e.dataTransfer.getData("text/plain");
+    endCharacterDrag();
+    const character = characters.find((c) => c.id === id);
+    if (!character) return;
+    if (!active) {
+      const encounter: Encounter = {
+        id: uid(),
+        name: "Encounter 1",
+        archived: false,
+        createdAt: Date.now(),
+        combatants: [combatantFromCharacter(character)],
+      };
+      setEncounters((all) => [...all, encounter]);
+      setActiveId(encounter.id);
+      return;
+    }
+    setEncounters((all) =>
+      all.map((en) => (en.id === active.id ? addCharacterToEncounter(en, character) : en)),
+    );
+  };
+  const allowCharacter = (e: React.DragEvent) => {
+    if (!draggedCharacterId()) return;
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  if (!ready) return <main className="min-w-0 flex-1" />;
+
   if (!active) {
     return (
-      <main className="flex flex-1 flex-col items-center justify-center gap-4 text-muted-foreground">
+      <main
+        className={cn(
+          "flex flex-1 flex-col items-center justify-center gap-4 text-muted-foreground",
+          dragOver && "bg-primary/5",
+        )}
+        onDragOver={allowCharacter}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          takeCharacter(e);
+        }}
+      >
         <p>Start your first encounter.</p>
         <Button onClick={newEncounter}>
           <Plus className="h-4 w-4" /> New encounter
@@ -108,7 +158,16 @@ function Index() {
       ];
 
   return (
-    <div className="flex min-w-0 flex-1">
+    <div
+      className={cn("flex min-w-0 flex-1", dragOver && "bg-primary/5")}
+      onDragOver={allowCharacter}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragOver(false);
+        takeCharacter(e);
+      }}
+    >
       <main className="min-w-0 flex-1 overflow-auto px-7 pb-8 pt-6">
         <div className="mb-5 flex flex-wrap items-center gap-4">
           <div className="min-w-[16rem] flex-1">

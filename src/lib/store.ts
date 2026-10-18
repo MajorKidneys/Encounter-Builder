@@ -1,5 +1,3 @@
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
-
 /**
  * Where saved data lives.
  *
@@ -49,8 +47,11 @@ function mirror(key: string, serialized: string | undefined) {
   }
 }
 
+const anySubscribers = new Set<(key: string) => void>();
+
 function notify(key: string) {
   subscribers.get(key)?.forEach((callback) => callback());
+  anySubscribers.forEach((callback) => callback(key));
 }
 
 function applyChange({ key, value }: Change) {
@@ -115,6 +116,13 @@ export function writeKey(key: string, value: unknown) {
   void bridge?.set(key, value).catch(() => {});
 }
 
+export function removeKey(key: string) {
+  if (!cache.has(key)) return;
+  cache.delete(key);
+  mirror(key, undefined);
+  void bridge?.remove(key).catch(() => {});
+}
+
 export function subscribeKey(key: string, callback: () => void) {
   let set = subscribers.get(key);
   if (!set) subscribers.set(key, (set = new Set()));
@@ -124,54 +132,42 @@ export function subscribeKey(key: string, callback: () => void) {
   };
 }
 
-/**
- * useState that loads from and saves to the store. `initial` shows until the store has been read;
- * `fallback` is used if nothing is saved yet. Changes made outside the app (by the connector)
- * replace the value while the app is open.
- */
-export function usePersistedState<T>(
-  key: string,
-  initial: T,
-  options: { fallback?: () => T; isValid?: (value: unknown) => boolean } = {},
-): readonly [T, Dispatch<SetStateAction<T>>, boolean] {
-  const [value, setValue] = useState<T>(initial);
-  const [loaded, setLoaded] = useState(false);
-  const optionsRef = useRef(options);
-  optionsRef.current = options;
-
-  useEffect(() => {
-    let alive = true;
-    let unsubscribe = () => {};
-    const pick = (): T => {
-      const { fallback, isValid } = optionsRef.current;
-      const stored = readKey(key);
-      if (stored !== undefined && (!isValid || isValid(stored))) return stored as T;
-      return fallback ? fallback() : initial;
-    };
-    void storageReady().then(() => {
-      if (!alive) return;
-      setValue(pick());
-      setLoaded(true);
-      unsubscribe = subscribeKey(key, () => setValue(pick()));
-    });
-    return () => {
-      alive = false;
-      unsubscribe();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-
-  useEffect(() => {
-    if (loaded) writeKey(key, value);
-  }, [value, loaded, key]);
-
-  return [value, setValue, loaded] as const;
+/** Called with the key whenever something outside this window changes a saved key. */
+export function subscribeAny(callback: (key: string) => void) {
+  anySubscribers.add(callback);
+  return () => {
+    anySubscribers.delete(callback);
+  };
 }
+
+/**
+ * A Storage-shaped view of the store, for code written against localStorage. Call after
+ * storageReady(). Values that are plain text (the old campaign name) read back as that text.
+ */
+export const storeAdapter: Storage = {
+  get length() {
+    return cache.size;
+  },
+  clear() {},
+  key: (index: number) => [...cache.keys()][index] ?? null,
+  getItem(key: string) {
+    const value = readKey(key);
+    if (value === undefined) return null;
+    return typeof value === "string" ? value : JSON.stringify(value);
+  },
+  setItem(key: string, raw: string) {
+    writeKey(key, parseTolerant(raw));
+  },
+  removeItem(key: string) {
+    removeKey(key);
+  },
+};
 
 /** For tests: forget everything and re-read the bridge on next use. */
 export function resetStoreForTests() {
   cache.clear();
   subscribers.clear();
+  anySubscribers.clear();
   bridge = undefined;
   ready = null;
 }
