@@ -1,46 +1,25 @@
+import { coerceCharacter, type Character } from "@/lib/characters";
+import type { Combatant, Encounter, LootItem } from "@/lib/encounters";
 import type { Keys } from "./dataFile.js";
 
-// Only the fields the connector reads. The app's full types live in src/lib/encounters.ts and characters.ts.
-export type LootItem = { id?: string; name: string; taken?: boolean; desc?: string };
-export type Combatant = {
-  id: string;
-  name: string;
-  qty?: number;
-  isPC?: boolean;
-  init?: number | null;
-  maxHp?: number | null;
-  loot?: LootItem[];
-  currency?: { cp?: number; sp?: number; gp?: number; pp?: number };
-  notes?: string;
-  stats?: { srdId?: string | null; srd?: boolean; name?: string; meta?: string; cr?: number; ac?: number; hp?: number; hitDice?: string };
-};
-export type Encounter = {
-  id: string;
-  name: string;
-  archived?: boolean;
-  round?: number;
-  combatants: Combatant[];
-};
-export type Character = {
-  id: string;
-  role: "pc" | "npc";
-  name: string;
-  race?: string;
-  classes?: string;
-  ac?: number | null;
-  maxHp?: number | null;
-  notes?: string;
-};
+export type { Character, Combatant, Encounter, LootItem };
+
 export type CampaignView = {
   id: string;
   name: string;
   active: boolean;
   encounters: Encounter[];
-  /** Saved party roster. Empty on app versions that don't have one yet. */
+  /** Saved party roster and NPC list. */
   characters: Character[];
+  /** The storage keys this campaign's data lives under, or null on the original single-campaign layout. */
+  keys: { encounters: string; characters: string } | null;
 };
 
 const asArray = <T>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
+const asCharacters = (value: unknown): Character[] =>
+  asArray<unknown>(value)
+    .map(coerceCharacter)
+    .filter((c): c is Character => c !== null);
 
 /**
  * Reads campaigns from the data file. Understands both layouts: the multi-campaign one
@@ -48,15 +27,15 @@ const asArray = <T>(value: unknown): T[] => (Array.isArray(value) ? (value as T[
  */
 export function loadCampaigns(keys: Keys): CampaignView[] {
   const index = keys["dm-campaigns-v2"] as
-    | { activeId?: string; campaigns?: { id: string; name: string }[] }
-    | undefined;
+    { activeId?: string; campaigns?: { id: string; name: string }[] } | undefined;
   if (index && Array.isArray(index.campaigns) && index.campaigns.length > 0) {
     return index.campaigns.map((c) => ({
       id: c.id,
       name: c.name,
       active: c.id === index.activeId,
       encounters: asArray<Encounter>(keys[`dm-c-${c.id}-encounters`]),
-      characters: asArray<Character>(keys[`dm-c-${c.id}-characters`]),
+      characters: asCharacters(keys[`dm-c-${c.id}-characters`]),
+      keys: { encounters: `dm-c-${c.id}-encounters`, characters: `dm-c-${c.id}-characters` },
     }));
   }
   const name = keys["dm-campaign-name-v1"];
@@ -67,6 +46,7 @@ export function loadCampaigns(keys: Keys): CampaignView[] {
       active: true,
       encounters: asArray<Encounter>(keys["dm-encounters-v1"]),
       characters: [],
+      keys: null,
     },
   ];
 }

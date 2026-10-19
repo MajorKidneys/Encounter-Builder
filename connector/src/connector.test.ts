@@ -8,11 +8,18 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { createServer } from "./server.js";
 import { matchScore } from "./matching.js";
 
-const libraryDir = path.resolve(__dirname, "..", "..", "src", "data");
-
 const combatant = (over: Record<string, unknown>) => ({
-  id: "c" + Math.random(), init: null, qty: 1, name: "x", isPC: false, maxHp: 10, units: [],
-  loot: [], currency: { cp: 0, sp: 0, gp: 0, pp: 0 }, notes: "", ...over,
+  id: "c" + Math.random(),
+  init: null,
+  qty: 1,
+  name: "x",
+  isPC: false,
+  maxHp: 10,
+  units: [],
+  loot: [],
+  currency: { cp: 0, sp: 0, gp: 0, pp: 0 },
+  notes: "",
+  ...over,
 });
 
 function writeData(dir: string, keys: Record<string, unknown>) {
@@ -20,7 +27,7 @@ function writeData(dir: string, keys: Record<string, unknown>) {
 }
 
 async function connect(dir: string) {
-  const server = createServer({ dataDir: dir, libraryDir });
+  const server = createServer({ dataDir: dir });
   const client = new Client({ name: "test", version: "1" });
   const [a, b] = InMemoryTransport.createLinkedPair();
   await Promise.all([server.connect(a), client.connect(b)]);
@@ -48,25 +55,57 @@ describe("connector (single-campaign data file)", () => {
       "dm-campaign-name-v1": "Winwoods",
       "dm-encounters-v1": [
         {
-          id: "e1", name: "The Congregation", archived: false, createdAt: 1,
+          id: "e1",
+          name: "The Congregation",
+          archived: false,
+          createdAt: 1,
           combatants: [
             combatant({ name: "Balgor", isPC: true, maxHp: 40 }),
-            combatant({ name: "Hezzix the Devoted", maxHp: 52, loot: [{ id: "l1", name: "Amulet of the Devout +1", taken: false }] }),
-            combatant({ name: "Lizardfolk", qty: 3, loot: [{ id: "l2", name: "Potion of Heroism", taken: true }],
-              stats: { srdId: null, srd: false, name: "Bayou Lizardfolk", cr: 0.5, ac: 15, hp: 38, hitDice: "7d8+7" } }),
+            combatant({
+              name: "Hezzix the Devoted",
+              maxHp: 52,
+              loot: [{ id: "l1", name: "Amulet of the Devout +1", taken: false }],
+            }),
+            combatant({
+              name: "Lizardfolk",
+              qty: 3,
+              loot: [{ id: "l2", name: "Potion of Heroism", taken: true }],
+              stats: {
+                srdId: null,
+                srd: false,
+                name: "Bayou Lizardfolk",
+                cr: 0.5,
+                ac: 15,
+                hp: 38,
+                hitDice: "7d8+7",
+              },
+            }),
           ],
         },
       ],
     });
   });
 
-  it("lists exactly the read tools, all marked read only", async () => {
+  it("lists the read tools (marked read only) and the write tools (marked not read only)", async () => {
     const { client } = await connect(dir);
     const { tools } = await client.listTools();
-    expect(tools.map((t) => t.name).sort()).toEqual(
-      ["find_encounter", "find_loot", "find_monster", "find_npc", "get_party"],
-    );
-    expect(tools.every((t) => t.annotations?.readOnlyHint)).toBe(true);
+    const readOnly = tools
+      .filter((t) => t.annotations?.readOnlyHint)
+      .map((t) => t.name)
+      .sort();
+    const writes = tools
+      .filter((t) => !t.annotations?.readOnlyHint)
+      .map((t) => t.name)
+      .sort();
+    expect(readOnly).toEqual([
+      "find_encounter",
+      "find_loot",
+      "find_monster",
+      "find_npc",
+      "get_party",
+      "list_sessions",
+    ]);
+    expect(writes).toEqual(["add_loot", "import_session", "update_encounter", "upsert_npc"]);
   });
 
   it("get_party falls back to PCs seen in encounters", async () => {
@@ -79,9 +118,13 @@ describe("connector (single-campaign data file)", () => {
   it("find_encounter and find_loot see the app's data", async () => {
     const { call } = await connect(dir);
     const enc = await call("find_encounter", { name: "congregation" });
-    expect(enc.json.matches[0].combatants.map((c: { name: string }) => c.name)).toContain("Hezzix the Devoted");
+    expect(enc.json.matches[0].combatants.map((c: { name: string }) => c.name)).toContain(
+      "Hezzix the Devoted",
+    );
     const loot = await call("find_loot", { name: "amulet" });
-    expect(loot.json.matches).toMatchObject([{ item: "Amulet of the Devout +1", carriedBy: "Hezzix the Devoted", taken: false }]);
+    expect(loot.json.matches).toMatchObject([
+      { item: "Amulet of the Devout +1", carriedBy: "Hezzix the Devoted", taken: false },
+    ]);
   });
 
   it("find_monster searches the bundled library and custom stat blocks", async () => {
@@ -119,9 +162,17 @@ describe("connector (multi-campaign layout)", () => {
   it("reads party and NPCs from the roster and picks campaigns by name", async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "conn-"));
     writeData(dir, {
-      "dm-campaigns-v2": { activeId: "b", campaigns: [{ id: "a", name: "Castaways", createdAt: 1 }, { id: "b", name: "Winwoods", createdAt: 2 }] },
+      "dm-campaigns-v2": {
+        activeId: "b",
+        campaigns: [
+          { id: "a", name: "Castaways", createdAt: 1 },
+          { id: "b", name: "Winwoods", createdAt: 2 },
+        ],
+      },
       "dm-c-a-encounters": [],
-      "dm-c-a-characters": [{ id: "p1", role: "pc", name: "Mara", classes: "Rogue 3", race: "Elf", ac: 15, maxHp: 22 }],
+      "dm-c-a-characters": [
+        { id: "p1", role: "pc", name: "Mara", classes: "Rogue 3", race: "Elf", ac: 15, maxHp: 22 },
+      ],
       "dm-c-b-encounters": [],
       "dm-c-b-characters": [
         { id: "p2", role: "pc", name: "Balgor", classes: "Fighter 5", ac: 18, maxHp: 52 },
@@ -130,8 +181,12 @@ describe("connector (multi-campaign layout)", () => {
     });
     const { call } = await connect(dir);
     expect((await call("get_party")).json.party).toMatchObject([{ name: "Balgor", level: 5 }]);
-    expect((await call("get_party", { campaign: "castaways" })).json.party).toMatchObject([{ name: "Mara", level: 3 }]);
-    expect((await call("find_npc", { name: "the captain" })).json.matches).toMatchObject([{ name: "Brother-Captain" }]);
+    expect((await call("get_party", { campaign: "castaways" })).json.party).toMatchObject([
+      { name: "Mara", level: 3 },
+    ]);
+    expect((await call("find_npc", { name: "the captain" })).json.matches).toMatchObject([
+      { name: "Brother-Captain" },
+    ]);
     expect((await call("get_party", { campaign: "nope" })).isError).toBe(true);
   });
 });

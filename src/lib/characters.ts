@@ -56,6 +56,10 @@ export type Character = {
   resources: CharacterResource[];
   gear: CharacterGear[];
   notes: string;
+  /** Other names the adventure calls this character, so "the Captain" finds "Brother-Captain". */
+  aliases?: string[] | undefined;
+  /** Where they first appear, e.g. "Winwoods S1 - U3". */
+  firstAppearance?: string | undefined;
 };
 
 const ABS = 6;
@@ -210,6 +214,10 @@ export function coerceCharacter(value: unknown): Character | null {
       : [],
     gear: Array.isArray(raw.gear) ? raw.gear.filter((g) => g && typeof g.name === "string") : [],
     notes: typeof raw.notes === "string" ? raw.notes : "",
+    ...(Array.isArray(raw.aliases)
+      ? { aliases: raw.aliases.filter((a): a is string => typeof a === "string") }
+      : {}),
+    ...(typeof raw.firstAppearance === "string" ? { firstAppearance: raw.firstAppearance } : {}),
   };
 }
 

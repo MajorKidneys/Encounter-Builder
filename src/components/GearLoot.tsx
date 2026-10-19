@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { LootDetail } from '@/components/encounter/PrepNotes';
 import { cn } from '@/lib/utils';
 
 const sel = 'h-8 rounded-md border border-input bg-background px-2 text-xs';
@@ -72,6 +73,7 @@ export function GearLoot({ c, update }: { c: Combatant; update: (fn: (c: Combata
             <span className="text-xs text-muted-foreground">{gear?.kind ?? 'Item'}</span>
             <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" aria-label={`Remove ${l.name}`} onClick={() => update(x => changeLoot(x, x.loot.filter(y => y.id !== l.id)))}><X className="h-4 w-4" /></Button>
           </div>
+          <LootDetail l={l} />
           {(gear || l.homebrew || l.magicId) && <div className="mt-1 flex gap-2">
             <BaseSelect label={`Equipment for ${l.name}`} value={gear?.id ?? ''} allowNone={!!(l.homebrew || l.magicId)} onChange={v => {
               const selected = equipment.find(e => e.id === v);

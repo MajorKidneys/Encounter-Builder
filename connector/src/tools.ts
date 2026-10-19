@@ -1,5 +1,5 @@
 import { bestScore, rank } from "./matching.js";
-import type { LibraryMonster } from "./library.js";
+import type { LibraryMonster } from "@/lib/monsters";
 import { pickCampaign, type CampaignView } from "./model.js";
 
 const LIMIT = 15;
@@ -67,9 +67,7 @@ export function findNpc(campaigns: CampaignView[], name: string, campaign?: stri
     campaign: c.name,
     matches,
     note:
-      npcs.length === 0
-        ? "This campaign has no saved NPCs yet, so nothing can match."
-        : undefined,
+      npcs.length === 0 ? "This campaign has no saved NPCs yet, so nothing can match." : undefined,
   };
 }
 

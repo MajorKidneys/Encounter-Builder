@@ -1,7 +1,8 @@
 /** A condition on one copy. `rounds` counts down when that creature's turn ends; null = until removed. */
 export type Condition = { id: string; name: string; rounds?: number | null | undefined; level?: number | undefined; note?: string | undefined; expired?: boolean | undefined };
 export type Unit = { id: string; hp: number; conditions?: Condition[] | undefined };
-export type LootItem = { id: string; name: string; taken: boolean; equipmentId?: string; native?: boolean; nativeAction?: import('./monsters').Feature | undefined; bonus?: number | undefined; magicId?: string | undefined; homebrew?: boolean | undefined; desc?: string | undefined; acBonus?: number | undefined; str?: number | undefined };
+export type LootItem = { id: string; name: string; taken: boolean; equipmentId?: string; native?: boolean; nativeAction?: import('./monsters').Feature | undefined; bonus?: number | undefined; magicId?: string | undefined; homebrew?: boolean | undefined; desc?: string | undefined; acBonus?: number | undefined; str?: number | undefined; /** Free text, e.g. "negotiation or combat only". */ condition?: string | undefined; /** A check that has to succeed to take it, e.g. Medicine DC 14 to harvest venom. */ harvest?: { skill: string; dc: number } | undefined; /** Free text so it can hold "50-80 gp" or stay blank for story items. */ value?: string | undefined };
+export type RoundBeat = { round: number | string; text: string };
 export type Currency = { cp: number; sp: number; gp: number; pp: number };
 export type Combatant = {
   id: string;
@@ -19,6 +20,12 @@ export type Combatant = {
   notes: string;
   /** Set when this row was added from the campaign's saved party. The row is a copy. */
   characterId?: string | undefined;
+  /** The saved NPC this row is, so a named character in a fight and on the NPC list are one person. */
+  npcId?: string | undefined;
+  /** The adventure's rule for how many, e.g. "1 per PC" or "4-6". The count itself is set on the row. */
+  countNote?: string | undefined;
+  /** When this group enters the fight: with everyone (start), on a round, or when the DM calls them (manual). */
+  joins?: "start" | "manual" | number | undefined;
   stats?: import("./monsters").MonsterStats | undefined;
   gearVersion?: number;
   gearAc?: number;
@@ -29,6 +36,20 @@ export type Encounter = {
   archived: boolean;
   createdAt: number;
   combatants: Combatant[];
+  /** The adventure session this was prepared for, e.g. "Winwoods S1 - Homecoming". */
+  session?: string | undefined;
+  /** Room or scene key from the adventure, e.g. "U3" or "G1 Conservatory". */
+  location?: string | undefined;
+  /** Dormant encounters only happen on a condition; `trigger` says which. */
+  status?: "staged" | "dormant" | undefined;
+  trigger?: string | undefined;
+  tactics?: string | undefined;
+  morale?: string | undefined;
+  /** Notes shown when a round starts. `round` can be a number, or "6+" for that round and every one after. */
+  beats?: RoundBeat[] | undefined;
+  /** Loot found in the room itself, not carried by a creature. */
+  roomLoot?: LootItem[] | undefined;
+  aliases?: string[] | undefined;
   /** 0 or missing = combat not started. */
   round?: number | undefined;
   /** Combatant whose turn it is. */

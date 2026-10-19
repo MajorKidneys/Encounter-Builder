@@ -16,6 +16,7 @@ import {
   turnOrder,
   unitLabel,
 } from "@/lib/turns";
+import { joinsLabel } from "@/lib/prep";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ConditionChips } from "./ConditionChips";
@@ -187,6 +188,11 @@ function CombatantRow({
                     >
                       <Link2 className="h-3 w-3" />
                       {src}
+                    </span>
+                  )}
+                  {i === 0 && (c.countNote || joinsLabel(c.joins)) && (
+                    <span className="text-xs text-muted-foreground">
+                      {[c.countNote, joinsLabel(c.joins)].filter(Boolean).join(" · ")}
                     </span>
                   )}
                   {i === 0 && c.isPC && (

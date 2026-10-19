@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/Workspace";
 import { InitiativeList } from "@/components/encounter/InitiativeList";
 import { AddCombatant } from "@/components/encounter/AddCombatant";
+import { PrepNotes } from "@/components/encounter/PrepNotes";
 import { CreatureDrawer } from "@/components/encounter/CreatureDrawer";
 import { cn } from "@/lib/utils";
 
@@ -254,6 +255,7 @@ function Index() {
             This encounter is archived. You can still edit it.
           </p>
         )}
+        <PrepNotes encounter={active} update={update} />
         <div className="grid gap-4">
           <InitiativeList
             encounter={active}
