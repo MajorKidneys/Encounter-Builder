@@ -437,6 +437,37 @@ describe("small edits", () => {
     expect(q.json.saved).toBe(false);
   });
 
+  it("upsert_npc saves the sheet, slots and a spellbook list", async () => {
+    const r = await call("upsert_npc", {
+      name: "Ilsabet Thorne",
+      race: "Human",
+      classes: "Wizard 5",
+      ac: 12,
+      maxHp: 32,
+      abilities: [8, 14, 14, 17, 12, 10],
+      spellAbility: "Intelligence",
+      spellDc: 15,
+      prepared: ["Shield", "Fireball"],
+      slots: [
+        { level: 1, count: 4 },
+        { level: 3, count: 2 },
+      ],
+      spellbook: ["Fireball", "Shield", "Made Up Spell"],
+    });
+    expect(r.json.saved).toBe(true);
+    expect(r.json.notInSrd).toEqual(["Made Up Spell"]);
+    const npc = characters().find((c) => c.name === "Ilsabet Thorne")!;
+    expect(npc.maxHp).toBe(32);
+    expect(npc.slots.map((s: J) => [s.level, s.max, s.current])).toEqual([
+      [1, 4, 4],
+      [3, 2, 2],
+    ]);
+    expect(npc.prepared).toEqual(["Shield", "Fireball"]);
+    const list = keys()["dm-c-c1-spell-lists"][0];
+    expect(list.name).toBe("Ilsabet Thorne's spellbook");
+    expect(list.spellIds).toHaveLength(2);
+  });
+
   it("list_sessions summarizes what is loaded", async () => {
     const r = await call("list_sessions");
     expect(r.json.sessions).toEqual([

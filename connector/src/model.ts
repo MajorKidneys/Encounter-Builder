@@ -1,4 +1,5 @@
 import { coerceCharacter, type Character } from "@/lib/characters";
+import type { SpellList } from "@/lib/spells";
 import type { Combatant, Encounter, LootItem } from "@/lib/encounters";
 import type { Keys } from "./dataFile.js";
 
@@ -11,8 +12,10 @@ export type CampaignView = {
   encounters: Encounter[];
   /** Saved party roster and NPC list. */
   characters: Character[];
+  /** Named spell lists shown on the Spell Book page. */
+  spellLists: SpellList[];
   /** The storage keys this campaign's data lives under, or null on the original single-campaign layout. */
-  keys: { encounters: string; characters: string } | null;
+  keys: { encounters: string; characters: string; spellLists: string } | null;
 };
 
 const asArray = <T>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
@@ -35,7 +38,12 @@ export function loadCampaigns(keys: Keys): CampaignView[] {
       active: c.id === index.activeId,
       encounters: asArray<Encounter>(keys[`dm-c-${c.id}-encounters`]),
       characters: asCharacters(keys[`dm-c-${c.id}-characters`]),
-      keys: { encounters: `dm-c-${c.id}-encounters`, characters: `dm-c-${c.id}-characters` },
+      spellLists: asArray<SpellList>(keys[`dm-c-${c.id}-spell-lists`]),
+      keys: {
+        encounters: `dm-c-${c.id}-encounters`,
+        characters: `dm-c-${c.id}-characters`,
+        spellLists: `dm-c-${c.id}-spell-lists`,
+      },
     }));
   }
   const name = keys["dm-campaign-name-v1"];
@@ -46,6 +54,7 @@ export function loadCampaigns(keys: Keys): CampaignView[] {
       active: true,
       encounters: asArray<Encounter>(keys["dm-encounters-v1"]),
       characters: [],
+      spellLists: [],
       keys: null,
     },
   ];

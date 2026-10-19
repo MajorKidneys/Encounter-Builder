@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { loadSpells } from "@/lib/spells";
 import { loadMagicItems } from "@/lib/equipment";
 import { loadLibrary } from "@/lib/monsters";
 import { readKeys, defaultDataDir, writeKeys } from "./dataFile.js";
 import { addLoot, editEncounter, listSessions } from "./edits.js";
-import { planImport, upsertNpc, type Plan, type PlanItem, type Uncertain } from "./importer.js";
+import { planImport, saveSpellbook, upsertNpc, type Plan, type PlanItem, type Uncertain } from "./importer.js";
 import { loadCampaigns, pickCampaign, type CampaignView } from "./model.js";
 import { beatSchema, bundleSchema, lootSchema, npcSchema } from "./schema.js";
 import { findEncounter, findLoot, findMonster, findNpc, getParty } from "./tools.js";
@@ -31,8 +32,9 @@ You build encounters, monsters, NPCs and loot in the GM's tracker from their adv
 6. Location is the room key from the doc (G1, U3, B9). If there are none, use the scene name.
 7. A bestiary with no fights imports as nothing: do not invent encounters.
 8. Character sheets (PCs) are read only.
-9. update_encounter, add_loot and upsert_npc change one thing right away. Use them only for a small edit the GM asked for, never to load a whole session.
-10. Loot is always linked: to the creature group that carries it, or to the room (leave carriedBy out). Never loose.`;
+9. NPCs that cast or fight get a real sheet: pass ac, maxHp, abilities, saves, attacks, spellAbility/spellDc/spellAttack, prepared, slots and spellbook (all spells known) to upsert_npc or the import bundle, not just notes. The sheet shows in the app and the spellbook appears on the Spell Book page.
+10. update_encounter, add_loot and upsert_npc change one thing right away. Use them only for a small edit the GM asked for, never to load a whole session.
+11. Loot is always linked: to the creature group that carries it, or to the room (leave carriedBy out). Never loose.`;
 
 type Annotations = { readOnlyHint: boolean; destructiveHint?: boolean; idempotentHint?: boolean };
 
@@ -178,6 +180,7 @@ export function createServer(opts: { dataDir?: string } = {}) {
       const plan: Plan = planImport(c, bundle, {
         library: await loadLibrary(),
         magic: await loadMagicItems(),
+        spells: await loadSpells(),
       });
       const id = fingerprint({ bundle, encounters: c.encounters, characters: c.characters });
       if (!confirm) {
@@ -204,7 +207,11 @@ export function createServer(opts: { dataDir?: string } = {}) {
         throw new Error(`Not saved: ${plan.uncertain.map((u: Uncertain) => u.question).join(" ")}`);
       }
       writeKeys(
-        { [keys.encounters]: plan.encounters, [keys.characters]: plan.characters },
+        {
+          [keys.encounters]: plan.encounters,
+          [keys.characters]: plan.characters,
+          [keys.spellLists]: plan.spellLists,
+        },
         dataDir,
       );
       return {
@@ -223,16 +230,26 @@ export function createServer(opts: { dataDir?: string } = {}) {
     "Add a named NPC to the campaign's NPC list, or add aliases and notes to the existing one when the name or an alias matches. Saves immediately. Use for a single NPC the GM asked for; use import_session to load a session.",
     { ...npcSchema.shape, campaign },
     WRITE,
-    ({ campaign: choice, ...npc }: z.infer<typeof npcSchema> & { campaign?: string }) => {
+    async ({ campaign: choice, ...npc }: z.infer<typeof npcSchema> & { campaign?: string }) => {
       const c = pickCampaign(campaigns(), choice);
       const keys = writable(c);
       const characters = structuredClone(c.characters);
       const items: PlanItem[] = [];
       const uncertain: Uncertain[] = [];
-      upsertNpc(characters, npc, "", items, uncertain);
+      const saved = upsertNpc(characters, npc, "", items, uncertain);
       if (uncertain.length) return { saved: false, questions: uncertain };
-      writeKeys({ [keys.characters]: characters }, dataDir);
-      return { saved: true, campaign: c.name, result: items };
+      const spellLists = structuredClone(c.spellLists);
+      const notInSrd =
+        saved && npc.spellbook?.length
+          ? saveSpellbook(spellLists, saved.name, npc.spellbook, await loadSpells())
+          : [];
+      writeKeys({ [keys.characters]: characters, [keys.spellLists]: spellLists }, dataDir);
+      return {
+        saved: true,
+        campaign: c.name,
+        result: items,
+        ...(npc.spellbook?.length ? { spellbook: `${npc.spellbook.length - notInSrd.length} linked`, notInSrd } : {}),
+      };
     },
   );
 

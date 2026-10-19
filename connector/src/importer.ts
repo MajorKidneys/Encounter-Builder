@@ -1,4 +1,5 @@
 import { makeCharacter } from "@/lib/characters";
+import type { SpellList } from "@/lib/spells";
 import { makeUnits, uid, type Combatant, type Encounter, type LootItem } from "@/lib/encounters";
 import {
   changeLoot,
@@ -19,7 +20,7 @@ import type {
   NpcInput,
 } from "./schema.js";
 
-export type Ctx = { library: LibraryMonster[]; magic: MagicItem[] };
+export type Ctx = { library: LibraryMonster[]; magic: MagicItem[]; spells: SrdSpell[] };
 export type PlanItem = {
   kind: "encounter" | "npc" | "group";
   action: "create" | "reuse" | "update" | "skip";
@@ -35,6 +36,7 @@ export type Uncertain = {
 export type Plan = {
   encounters: Encounter[];
   characters: Character[];
+  spellLists: SpellList[];
   items: PlanItem[];
   gaps: string[];
   uncertain: Uncertain[];
@@ -209,6 +211,70 @@ function buildGroup(
 
 // ---------- NPCs ----------
 
+type SrdSpell = { id: string; name: string };
+const spellKey = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
+
+/** Sheet fields the connector sends. Only fields that were sent change, so hand edits survive. */
+function applySheet(c: Character, n: NpcInput): string[] {
+  const changed: string[] = [];
+  const set = <K extends keyof Character>(key: K, value: Character[K] | undefined, label: string) => {
+    if (value === undefined || JSON.stringify(c[key]) === JSON.stringify(value)) return;
+    c[key] = value;
+    changed.push(label);
+  };
+  set("ac", n.ac, "AC");
+  set("acNote", n.acNote, "AC note");
+  set("maxHp", n.maxHp, "max HP");
+  set("speed", n.speed, "speed");
+  set("abilities", n.abilities, "ability scores");
+  set("saves", n.saves, "saves");
+  set("passive", n.passive, "passive perception");
+  set("senses", n.senses, "senses");
+  set("attacks", n.attacks?.map((a) => ({ id: uid(), ...a })), "attacks");
+  set("spellAbility", n.spellAbility, "spell ability");
+  set("spellDc", n.spellDc, "spell DC");
+  set("spellAttack", n.spellAttack, "spell attack");
+  set("prepared", n.prepared, "prepared spells");
+  if (n.slots) {
+    const slots = n.slots.map((s) => ({
+      id: uid(),
+      kind: "spell" as const,
+      level: s.level,
+      max: s.count,
+      current: s.count,
+    }));
+    const same =
+      c.slots.length === slots.length &&
+      slots.every((s, i) => c.slots[i]!.level === s.level && c.slots[i]!.max === s.max);
+    if (!same) {
+      c.slots = slots;
+      changed.push("spell slots");
+    }
+  }
+  return changed;
+}
+
+/** Saves the NPC's spellbook as a named list, linking SRD spells by name. Returns the names the SRD lacks. */
+export function saveSpellbook(
+  lists: SpellList[],
+  npcName: string,
+  names: string[],
+  srd: SrdSpell[],
+): string[] {
+  const ids: string[] = [];
+  const missing: string[] = [];
+  for (const name of names) {
+    const hit = srd.find((s) => spellKey(s.name) === spellKey(name));
+    if (!hit) missing.push(name);
+    else if (!ids.includes(hit.id)) ids.push(hit.id);
+  }
+  const listName = `${npcName}'s spellbook`;
+  const existing = lists.find((l) => l.name === listName);
+  if (existing) existing.spellIds = ids;
+  else lists.push({ id: uid(), name: listName, spellIds: ids });
+  return missing;
+}
+
 /** Finds, updates or creates an NPC. Returns undefined when the match is uncertain and needs the GM. */
 export function upsertNpc(
   characters: Character[],
@@ -250,6 +316,7 @@ export function upsertNpc(
     }
     if (n.race && !exact.race) exact.race = n.race;
     if (n.classes && !exact.classes) exact.classes = n.classes;
+    changed.push(...applySheet(exact, n));
     items.push({
       kind: "npc",
       action: changed.length ? "update" : "reuse",
@@ -266,8 +333,16 @@ export function upsertNpc(
     ...(n.aliases?.length ? { aliases: n.aliases } : {}),
     firstAppearance: n.firstAppearance ?? session,
   };
+  const sheet = applySheet(created, n);
   characters.push(created);
-  items.push({ kind: "npc", action: "create", name: n.name, detail: n.description });
+  items.push({
+    kind: "npc",
+    action: "create",
+    name: n.name,
+    detail: [n.description, sheet.length ? `sheet: ${sheet.join(", ")}` : ""]
+      .filter(Boolean)
+      .join(" — "),
+  });
   return created;
 }
 
@@ -284,7 +359,14 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
   let lootSkipped = 0;
   let customMonsters = 0;
 
-  for (const n of bundle.npcs) upsertNpc(characters, n, bundle.session, items, uncertain);
+  const spellLists = structuredClone(campaign.spellLists);
+  for (const n of bundle.npcs) {
+    const saved = upsertNpc(characters, n, bundle.session, items, uncertain);
+    if (saved && n.spellbook?.length) {
+      const missing = saveSpellbook(spellLists, saved.name, n.spellbook, ctx.spells);
+      if (missing.length) gaps.push(`${saved.name}: not in the SRD spell list, name only: ${missing.join(", ")}`);
+    }
+  }
 
   for (const e of bundle.encounters) {
     const sameKey = (x: Encounter) =>
@@ -413,5 +495,5 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
     .filter(Boolean)
     .join(" ");
 
-  return { encounters, characters, items, gaps, uncertain, headline };
+  return { encounters, characters, spellLists, items, gaps, uncertain, headline };
 }

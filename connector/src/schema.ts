@@ -150,6 +150,45 @@ export const npcSchema = z.object({
   notes: z.string().optional(),
   race: z.string().optional(),
   classes: z.string().optional(),
+  ac: z.number().int().optional(),
+  acNote: z.string().optional().describe('e.g. "15 with mage armor"'),
+  maxHp: z.number().int().optional(),
+  speed: z.string().optional(),
+  abilities: z
+    .array(z.number().int())
+    .length(6)
+    .optional()
+    .describe("Scores in the order STR, DEX, CON, INT, WIS, CHA"),
+  saves: z.string().optional().describe('e.g. "Wis +7, Int +7"'),
+  passive: z.number().int().optional().describe("Passive Perception"),
+  senses: z.string().optional(),
+  attacks: z
+    .array(
+      z.object({
+        name: z.string(),
+        attack: z.string().describe('To-hit, e.g. "+7"'),
+        damage: z.string().describe('e.g. "2d10 fire"'),
+      }),
+    )
+    .optional()
+    .describe("Replaces the NPC's attacks"),
+  spellAbility: z.string().optional().describe('e.g. "Intelligence"'),
+  spellDc: z.number().int().optional(),
+  spellAttack: z.number().int().optional(),
+  prepared: z
+    .array(z.string())
+    .optional()
+    .describe("Spell names the NPC has ready (cantrips included). Replaces the prepared list."),
+  slots: z
+    .array(z.object({ level: z.number().int().min(1).max(9), count: z.number().int().min(1).max(9) }))
+    .optional()
+    .describe("Spell slots per level, e.g. [{level:1,count:4}]. Replaces the NPC's slots."),
+  spellbook: z
+    .array(z.string())
+    .optional()
+    .describe(
+      "Every spell the NPC knows. Saved as a named list on the Spell Book page; SRD spells link to their full text, others are reported back.",
+    ),
   distinct: z
     .boolean()
     .optional()
