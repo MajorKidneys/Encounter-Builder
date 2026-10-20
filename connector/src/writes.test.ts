@@ -288,6 +288,7 @@ describe("import_session", () => {
           name: "flooded nave",
           tactics: "From the doc",
           morale: "Never breaks",
+          setting: "A flooded chapel, water to the knees, candles still burning.",
           groups: [
             { monster: "Zombie", count: 6 },
             { monster: "Ghoul", count: 1 },
@@ -303,6 +304,7 @@ describe("import_session", () => {
     expect(e.id).toBe("hand");
     expect(e.tactics).toBe("My own tactics");
     expect(e.morale).toBe("Never breaks");
+    expect(e.setting).toBe("A flooded chapel, water to the knees, candles still burning.");
     expect(e.combatants.map((c: J) => [c.name, c.qty])).toEqual([
       ["Zombie", 4],
       ["Ghoul", 1],
@@ -401,10 +403,18 @@ describe("small edits", () => {
     const r = await call("update_encounter", {
       encounter: "orveth",
       status: "staged",
+      setting: "A stone landing above the nave.",
       groups: [{ name: "Orveth", count: 2 }],
     });
-    expect(r.json.changes).toEqual(["status → staged", "Orveth: 1 → 2"]);
-    expect(enc("The Orveth")).toMatchObject({ status: "staged" });
+    expect(r.json.changes).toEqual([
+      "status → staged",
+      "setting → A stone landing above the nave.",
+      "Orveth: 1 → 2",
+    ]);
+    expect(enc("The Orveth")).toMatchObject({
+      status: "staged",
+      setting: "A stone landing above the nave.",
+    });
     expect(enc("The Orveth").combatants[0]).toMatchObject({ qty: 2 });
     expect(enc("The Orveth").combatants[0].units).toHaveLength(2);
     expect((await call("update_encounter", { encounter: "nope" })).isError).toBe(true);

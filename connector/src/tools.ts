@@ -78,6 +78,7 @@ export function findEncounter(campaigns: CampaignView[], name: string, campaign?
     name: e.name,
     archived: Boolean(e.archived),
     round: e.round && e.round > 0 ? e.round : null,
+    setting: e.setting || null,
     combatants: e.combatants.map((cb) => ({
       name: cb.name,
       qty: cb.qty ?? 1,

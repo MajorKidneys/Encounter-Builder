@@ -21,10 +21,10 @@ Write:
 
 | Tool | What it does |
 | --- | --- |
-| `import_session` | Loads a prepared session (NPCs, encounters, groups, loot). **Preview first**: nothing is saved until it is called again with `confirm: true` and the `planId` from the preview. Exact matches are reused, similar names come back as questions. |
+| `import_session` | Loads a prepared session (NPCs, encounters, groups, loot, and a short setting description). **Preview first**: nothing is saved until it is called again with `confirm: true` and the `planId` from the preview. Exact matches are reused, similar names come back as questions. |
 | `upsert_npc` | Adds an NPC, or adds aliases/notes to the matching one |
 | `upsert_pc` | Uploads a player character sheet (class, AC, HP, abilities, attacks, spells, slots, limited uses, gear); updates the matching PC |
-| `update_encounter` | Small edits: location, dormant/staged, trigger, tactics, morale, beats, a group's count |
+| `update_encounter` | Small edits: setting description, location, dormant/staged, trigger, tactics, morale, beats, a group's count |
 | `add_loot` | Adds loot to a creature group or to the room |
 
 Rows are built with the app's own code (monster library, native gear, AC), so they match ones added by hand.

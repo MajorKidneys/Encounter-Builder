@@ -33,6 +33,7 @@ export type EncounterEdit = {
   trigger?: string | undefined;
   tactics?: string | undefined;
   morale?: string | undefined;
+  setting?: string | undefined;
   beats?: { round: number | string; text: string }[] | undefined;
   groups?:
     | {
@@ -49,7 +50,9 @@ export function editEncounter(campaign: CampaignView, edit: EncounterEdit) {
   const encounters = structuredClone(campaign.encounters);
   const enc = pickOne(encounters, edit.encounter, "encounter");
   const changes: string[] = [];
-  const set = <K extends "name" | "location" | "trigger" | "tactics" | "morale" | "status">(
+  const set = <
+    K extends "name" | "location" | "trigger" | "tactics" | "morale" | "setting" | "status",
+  >(
     key: K,
   ) => {
     const value = edit[key];
@@ -58,7 +61,7 @@ export function editEncounter(campaign: CampaignView, edit: EncounterEdit) {
       changes.push(`${key} → ${value}`);
     }
   };
-  (["name", "location", "status", "trigger", "tactics", "morale"] as const).forEach(set);
+  (["name", "location", "status", "trigger", "tactics", "morale", "setting"] as const).forEach(set);
   if (edit.beats) {
     enc.beats = edit.beats;
     changes.push(`round beats replaced (${edit.beats.length})`);

@@ -7,6 +7,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  Settings,
   Swords,
   Trash2,
   Users,
@@ -21,9 +22,12 @@ import {
 } from "@/lib/characters";
 import { DEFAULT_CAMPAIGN_NAME, useCampaignStore } from "@/lib/campaigns";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import { applyTheme, readTheme, writeTheme, type ThemeChoice } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
+import { Tombstone } from "@/components/Tombstone";
 
 type WorkspaceState = ReturnType<typeof useCampaignStore> & {
   activeId: string | null;
@@ -42,6 +46,7 @@ export function Workspace({ children }: { children: ReactNode }) {
   const campaigns = useCampaignStore();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [open, setOpen] = useState(true);
+  const [theme, setTheme] = useState<ThemeChoice>("auto");
   const [renameArmed, setRenameArmed] = useState(false);
   const nameRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
@@ -51,6 +56,18 @@ export function Workspace({ children }: { children: ReactNode }) {
   const selectedList = (location.search as { list?: string }).list;
   const selectedCharacter = (location.search as { id?: string }).id;
   const active = campaigns.encounters.find((e) => e.id === activeId) ?? campaigns.encounters[0];
+
+  useEffect(() => {
+    const choice = readTheme();
+    setTheme(choice);
+    applyTheme(choice);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => {
+      if (readTheme() === "auto") applyTheme("auto");
+    };
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     if (!renameArmed || !campaigns.ready) return;
@@ -118,11 +135,11 @@ export function Workspace({ children }: { children: ReactNode }) {
 
   return (
     <WorkspaceContext.Provider value={{ ...campaigns, activeId, setActiveId, newEncounter }}>
-      <div className="flex h-screen w-full bg-background text-foreground">
+      <div className="flex h-dvh min-h-0 w-full overflow-hidden bg-background text-foreground">
         <aside
           aria-label="Main navigation"
           className={cn(
-            "flex shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 motion-reduce:transition-none",
+            "flex h-full min-h-0 shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 motion-reduce:transition-none",
             open ? "w-64" : "w-14",
           )}
         >
@@ -328,7 +345,7 @@ export function Workspace({ children }: { children: ReactNode }) {
               />
             </nav>
           ) : (
-            <nav className="flex flex-col items-center gap-2 py-3">
+            <nav className="flex min-h-0 flex-1 flex-col items-center gap-2 overflow-y-auto py-3">
               <Button asChild variant="ghost" size="icon" title="Encounters">
                 <Link to="/" aria-label="Encounters">
                   <Swords />
@@ -346,13 +363,79 @@ export function Workspace({ children }: { children: ReactNode }) {
               </Button>
             </nav>
           )}
+          <ThemeSettings
+            open={open}
+            theme={theme}
+            onChange={(choice) => {
+              setTheme(choice);
+              writeTheme(choice);
+            }}
+          />
         </aside>
-        <div key={campaigns.campaignId ?? "pending"} className="flex min-w-0 flex-1">
+        <div
+          key={campaigns.campaignId ?? "pending"}
+          className="flex min-h-0 min-w-0 flex-1 overflow-hidden"
+        >
           {children}
         </div>
       </div>
       <Toaster position="bottom-right" />
     </WorkspaceContext.Provider>
+  );
+}
+
+const THEMES: { id: ThemeChoice; label: string }[] = [
+  { id: "light", label: "Light" },
+  { id: "dark", label: "Dark" },
+  { id: "auto", label: "Auto" },
+];
+
+function ThemeSettings({
+  open,
+  theme,
+  onChange,
+}: {
+  open: boolean;
+  theme: ThemeChoice;
+  onChange: (choice: ThemeChoice) => void;
+}) {
+  return (
+    <div className={cn("border-t border-border p-2", open ? "" : "flex justify-center")}>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size={open ? "default" : "icon"}
+            aria-label="Settings"
+            title="Settings"
+            className={cn(open && "w-full justify-start px-2.5 font-normal")}
+          >
+            <Settings />
+            {open && "Settings"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent side="top" align="start" className="w-52 p-3">
+          <p className="label-caps mb-2">Appearance</p>
+          <div role="radiogroup" aria-label="Appearance" className="grid gap-1">
+            {THEMES.map((choice) => (
+              <button
+                key={choice.id}
+                type="button"
+                role="radio"
+                aria-checked={theme === choice.id}
+                onClick={() => onChange(choice.id)}
+                className={cn(
+                  "rounded-md px-2.5 py-1.5 text-left text-sm hover:bg-accent",
+                  theme === choice.id && "bg-accent font-semibold",
+                )}
+              >
+                {choice.label}
+              </button>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }
 
@@ -368,7 +451,7 @@ function CharacterNav({
   addLabel,
 }: {
   title: string;
-  people: { id: string; name: string; race: string; classes: string }[];
+  people: { id: string; name: string; race: string; classes: string; dead?: boolean | undefined }[];
   selectedId: string | undefined;
   activeClass: string;
   inactiveClass: string;
@@ -405,7 +488,15 @@ function CharacterNav({
               )}
               aria-current={selectedId === c.id ? "page" : undefined}
             >
-              <span className="min-w-0 truncate">{c.name}</span>
+              <span className="flex min-w-0 items-center gap-1.5">
+                {c.dead && (
+                  <span title="Dead" className="shrink-0 text-muted-foreground">
+                    <Tombstone />
+                    <span className="sr-only">Dead</span>
+                  </span>
+                )}
+                <span className="min-w-0 truncate">{c.name}</span>
+              </span>
             </div>
           </li>
         ))}

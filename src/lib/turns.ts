@@ -53,6 +53,9 @@ export const hasRolled = (c: Combatant) => c.init !== null && c.init !== undefin
 export const isDown = (c: Combatant) =>
   !c.isPC && c.maxHp !== null && c.units.length > 0 && c.units.every((u) => u.hp <= 0);
 
+/** One copy is dead when its hit points are tracked and have reached 0. */
+export const isUnitDead = (c: Combatant, u: Unit) => c.maxHp !== null && u.hp <= 0;
+
 export const canAct = (c: Combatant) => hasRolled(c) && !isDown(c) && !c.held;
 
 /** Rolled creatures by initiative (ties keep their list order), then everyone still waiting to roll. */
