@@ -105,7 +105,7 @@ describe("connector (single-campaign data file)", () => {
       "get_party",
       "list_sessions",
     ]);
-    expect(writes).toEqual(["add_loot", "import_session", "update_encounter", "upsert_npc"]);
+    expect(writes).toEqual(["add_loot", "import_session", "update_encounter", "upsert_npc", "upsert_pc"]);
   });
 
   it("get_party falls back to PCs seen in encounters", async () => {

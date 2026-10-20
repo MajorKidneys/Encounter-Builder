@@ -1,4 +1,4 @@
-import { makeCharacter } from "@/lib/characters";
+import { makeCharacter, type CharacterRole } from "@/lib/characters";
 import type { SpellList } from "@/lib/spells";
 import { makeUnits, uid, type Combatant, type Encounter, type LootItem } from "@/lib/encounters";
 import {
@@ -235,6 +235,18 @@ function applySheet(c: Character, n: NpcInput): string[] {
   set("spellDc", n.spellDc, "spell DC");
   set("spellAttack", n.spellAttack, "spell attack");
   set("prepared", n.prepared, "prepared spells");
+  set("gear", n.gear?.map((g) => ({ id: uid(), name: g.name, note: g.note ?? "" })), "gear");
+  set(
+    "resources",
+    n.resources?.map((r) => ({
+      id: uid(),
+      name: r.name,
+      max: r.max,
+      current: Math.min(r.current ?? r.max, r.max),
+      reset: r.reset ?? null,
+    })),
+    "limited uses",
+  );
   if (n.slots) {
     const slots = n.slots.map((s) => ({
       id: uid(),
@@ -282,8 +294,10 @@ export function upsertNpc(
   session: string,
   items: PlanItem[],
   uncertain: Uncertain[],
+  role: CharacterRole = "npc",
 ): Character | undefined {
-  const npcs = characters.filter((c) => c.role === "npc");
+  const label = role === "pc" ? "player character" : "NPC";
+  const npcs = characters.filter((c) => c.role === role);
   const exact = npcs.find((c) => isExact(n.name, c));
   const similar = !exact && !n.distinct ? npcs.find((c) => isSimilar(n.name, c)) : undefined;
   if (similar) {
@@ -291,7 +305,7 @@ export function upsertNpc(
       kind: "npc",
       proposed: n.name,
       existing: similar.name,
-      question: `Is "${n.name}" the same person as the existing NPC "${similar.name}"? If yes, use that exact name; if not, send it again with distinct: true.`,
+      question: `Is "${n.name}" the same person as the existing ${label} "${similar.name}"? If yes, use that exact name; if not, send it again with distinct: true.`,
     });
     return undefined;
   }
@@ -321,17 +335,17 @@ export function upsertNpc(
       kind: "npc",
       action: changed.length ? "update" : "reuse",
       name: exact.name,
-      detail: changed.length ? `added ${changed.join(", ")}` : "already on the NPC list",
+      detail: changed.length ? `added ${changed.join(", ")}` : `already on the ${role === "pc" ? "party" : "NPC"} list`,
     });
     return exact;
   }
   const created: Character = {
-    ...makeCharacter("npc", n.name),
+    ...makeCharacter(role, n.name),
     race: n.race ?? "",
     classes: n.classes ?? "",
     notes: note,
     ...(n.aliases?.length ? { aliases: n.aliases } : {}),
-    firstAppearance: n.firstAppearance ?? session,
+    ...(role === "npc" ? { firstAppearance: n.firstAppearance ?? session } : {}),
   };
   const sheet = applySheet(created, n);
   characters.push(created);

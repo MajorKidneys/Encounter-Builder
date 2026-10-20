@@ -468,6 +468,31 @@ describe("small edits", () => {
     expect(list.spellIds).toHaveLength(2);
   });
 
+  it("upsert_pc uploads a player sheet, then updates it without resetting spent slots", async () => {
+    const sheet = {
+      name: "Brannoch",
+      race: "Dwarf",
+      classes: "Cleric 5",
+      ac: 18,
+      maxHp: 41,
+      slots: [{ level: 1, count: 4 }],
+      resources: [{ name: "Channel Divinity", max: 1, reset: "short" }],
+      gear: [{ name: "Warhammer", note: "+1" }],
+    };
+    const r = await call("upsert_pc", sheet);
+    expect(r.json.saved).toBe(true);
+    const pc = () => characters().find((c) => c.name === "Brannoch")!;
+    expect(pc().role).toBe("pc");
+    expect(pc().resources[0].reset).toBe("short");
+    expect(pc().gear[0].name).toBe("Warhammer");
+    expect(pc().firstAppearance).toBeUndefined();
+    const again = await call("upsert_pc", { name: "Brannoch", ac: 19 });
+    expect(again.json.result[0].action).toBe("update");
+    expect(pc().ac).toBe(19);
+    expect(pc().maxHp).toBe(41);
+    expect(characters().filter((c) => c.name === "Brannoch")).toHaveLength(1);
+  });
+
   it("list_sessions summarizes what is loaded", async () => {
     const r = await call("list_sessions");
     expect(r.json.sessions).toEqual([

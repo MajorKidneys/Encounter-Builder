@@ -8,7 +8,7 @@ import { readKeys, defaultDataDir, writeKeys } from "./dataFile.js";
 import { addLoot, editEncounter, listSessions } from "./edits.js";
 import { planImport, saveSpellbook, upsertNpc, type Plan, type PlanItem, type Uncertain } from "./importer.js";
 import { loadCampaigns, pickCampaign, type CampaignView } from "./model.js";
-import { beatSchema, bundleSchema, lootSchema, npcSchema } from "./schema.js";
+import { beatSchema, bundleSchema, lootSchema, npcSchema, pcSchema } from "./schema.js";
 import { findEncounter, findLoot, findMonster, findNpc, getParty } from "./tools.js";
 
 export const INSTRUCTIONS = `# Encounter Tracker
@@ -31,7 +31,7 @@ You build encounters, monsters, NPCs and loot in the GM's tracker from their adv
 5. Mark conditional encounters status "dormant" with a trigger, e.g. "only if someone takes the chalice".
 6. Location is the room key from the doc (G1, U3, B9). If there are none, use the scene name.
 7. A bestiary with no fights imports as nothing: do not invent encounters.
-8. Character sheets (PCs) are read only.
+8. Player characters are only written when the GM hands you a sheet to upload: use upsert_pc, after get_party shows whether the character already exists. Never edit a PC otherwise.
 9. NPCs that cast or fight get a real sheet: pass ac, maxHp, abilities, saves, attacks, spellAbility/spellDc/spellAttack, prepared, slots and spellbook (all spells known) to upsert_npc or the import bundle, not just notes. The sheet shows in the app and the spellbook appears on the Spell Book page.
 10. update_encounter, add_loot and upsert_npc change one thing right away. Use them only for a small edit the GM asked for, never to load a whole session.
 11. Loot is always linked: to the creature group that carries it, or to the room (leave carriedBy out). Never loose.`;
@@ -249,6 +249,35 @@ export function createServer(opts: { dataDir?: string } = {}) {
         campaign: c.name,
         result: items,
         ...(npc.spellbook?.length ? { spellbook: `${npc.spellbook.length - notInSrd.length} linked`, notInSrd } : {}),
+      };
+    },
+  );
+
+  register(
+    "upsert_pc",
+    "Upload a player character sheet to the campaign's party: race, class and level, AC, HP, speed, abilities, saves, attacks, spellcasting, prepared spells, slots, limited uses (Channel Divinity, Rage...), gear and notes. " +
+      "Creates the character, or updates the one whose name matches (only the fields you send change, so hand edits and current slot use survive). Saves immediately; use only when the GM gave you a sheet to upload. A similar name comes back as a question.",
+    { ...pcSchema.shape, campaign },
+    WRITE,
+    async ({ campaign: choice, ...pc }: z.infer<typeof pcSchema> & { campaign?: string }) => {
+      const c = pickCampaign(campaigns(), choice);
+      const keys = writable(c);
+      const characters = structuredClone(c.characters);
+      const items: PlanItem[] = [];
+      const uncertain: Uncertain[] = [];
+      const saved = upsertNpc(characters, pc, "", items, uncertain, "pc");
+      if (uncertain.length) return { saved: false, questions: uncertain };
+      const spellLists = structuredClone(c.spellLists);
+      const notInSrd =
+        saved && pc.spellbook?.length
+          ? saveSpellbook(spellLists, saved.name, pc.spellbook, await loadSpells())
+          : [];
+      writeKeys({ [keys.characters]: characters, [keys.spellLists]: spellLists }, dataDir);
+      return {
+        saved: true,
+        campaign: c.name,
+        result: items,
+        ...(pc.spellbook?.length ? { spellbook: `${pc.spellbook.length - notInSrd.length} linked`, notInSrd } : {}),
       };
     },
   );

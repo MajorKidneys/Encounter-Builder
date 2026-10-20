@@ -189,6 +189,21 @@ export const npcSchema = z.object({
     .describe(
       "Every spell the NPC knows. Saved as a named list on the Spell Book page; SRD spells link to their full text, others are reported back.",
     ),
+  gear: z
+    .array(z.object({ name: z.string(), note: z.string().optional() }))
+    .optional()
+    .describe("Carried gear and notable items. Replaces the gear list."),
+  resources: z
+    .array(
+      z.object({
+        name: z.string().describe('e.g. "Channel Divinity"'),
+        max: z.number().int().min(1),
+        current: z.number().int().min(0).optional().describe("Defaults to max"),
+        reset: z.enum(["short", "long"]).nullable().optional().describe("Rest that refills it; null or omitted = manual"),
+      }),
+    )
+    .optional()
+    .describe("Limited uses that are not spell slots. Replaces the list."),
   distinct: z
     .boolean()
     .optional()
@@ -196,6 +211,7 @@ export const npcSchema = z.object({
       "Set only after the GM confirmed this is a different person from a similar existing NPC",
     ),
 });
+export const pcSchema = npcSchema.omit({ firstAppearance: true });
 export type NpcInput = z.infer<typeof npcSchema>;
 
 export const bundleSchema = z.object({
