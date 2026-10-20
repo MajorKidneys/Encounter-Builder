@@ -18,11 +18,13 @@ import {
   turnOrder,
 } from "@/lib/turns";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useWorkspace } from "@/components/Workspace";
 import { InitiativeList } from "@/components/encounter/InitiativeList";
 import { AddCombatant } from "@/components/encounter/AddCombatant";
 import { PrepNotes } from "@/components/encounter/PrepNotes";
 import { CreatureDrawer } from "@/components/encounter/CreatureDrawer";
+import { Stage } from "@/components/Stage";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -115,13 +117,13 @@ function Index() {
     setDragOver(true);
   };
 
-  if (!ready) return <main className="min-w-0 flex-1" />;
+  if (!ready) return <main className="min-h-0 min-w-0 flex-1" />;
 
   if (!active) {
     return (
       <main
         className={cn(
-          "flex flex-1 flex-col items-center justify-center gap-4 text-muted-foreground",
+          "flex min-h-0 flex-1 flex-col items-center justify-center gap-4 text-muted-foreground",
           dragOver && "bg-primary/5",
         )}
         onDragOver={allowCharacter}
@@ -159,122 +161,140 @@ function Index() {
       ];
 
   return (
-    <div
-      className={cn("flex min-w-0 flex-1", dragOver && "bg-primary/5")}
-      onDragOver={allowCharacter}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={(e) => {
-        e.preventDefault();
-        setDragOver(false);
-        takeCharacter(e);
-      }}
+    <Stage
+      drawer={
+        drawer && (
+          <CreatureDrawer
+            c={drawer}
+            onClose={() => setDrawerId(null)}
+            update={(fn) => updateC(drawer.id, fn)}
+          />
+        )
+      }
     >
-      <main className="min-w-0 flex-1 overflow-auto px-7 pb-8 pt-6">
-        <div className="mb-5 flex flex-wrap items-center gap-4">
-          <div className="min-w-[16rem] flex-1">
-            <input
-              aria-label="Encounter name"
-              value={active.name}
-              onChange={(ev) => update((e) => ({ ...e, name: ev.target.value }))}
-              className="-ml-1.5 w-full max-w-xl rounded-md border border-transparent bg-transparent px-1.5 font-display text-[28px] font-bold leading-tight tracking-tight outline-none hover:border-input focus:border-primary focus:bg-card"
-            />
-            <p className="mt-0.5 text-[12.5px] text-muted-foreground">
-              {meta.filter(Boolean).join(" · ")}
-            </p>
-          </div>
-          {live ? (
-            <div className="flex items-center gap-1 rounded-xl border border-border bg-card p-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Previous turn"
-                title="Previous turn"
-                onClick={() => update(prevTurn)}
-              >
-                <ChevronLeft />
-              </Button>
-              <div className="grid justify-items-center px-3 leading-none">
-                <span className="label-caps text-[9.5px]">Round</span>
-                <b className="font-mono text-lg font-semibold tabular">{active.round}</b>
-              </div>
-              <Button onClick={() => update(nextTurn)}>
-                Next turn{" "}
-                <kbd className="rounded bg-white/20 px-1.5 font-mono text-[10.5px]">Space</kbd>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="End combat"
-                title="End combat (keeps HP, conditions and initiative)"
-                onClick={() => update(endCombat)}
-              >
-                <Square className="h-4 w-4" />
-              </Button>
+      <div
+        className={cn("flex min-h-0 min-w-0 flex-1 overflow-hidden", dragOver && "bg-primary/5")}
+        onDragOver={allowCharacter}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          takeCharacter(e);
+        }}
+      >
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-y-contain px-7 pb-8 pt-6">
+          <div className="mb-5 flex flex-wrap items-center gap-4">
+            <div className="min-w-[16rem] flex-1">
+              <input
+                aria-label="Encounter name"
+                value={active.name}
+                onChange={(ev) => update((e) => ({ ...e, name: ev.target.value }))}
+                className="-ml-1.5 w-full max-w-xl rounded-md border border-transparent bg-transparent px-1.5 font-display text-[28px] font-bold leading-tight tracking-tight outline-none hover:border-input focus:border-primary focus:bg-card"
+              />
+              <p className="mt-0.5 text-[12.5px] text-muted-foreground">
+                {meta.filter(Boolean).join(" · ")}
+              </p>
             </div>
-          ) : (
-            <Button
-              onClick={() => update(startCombat)}
-              disabled={!active.combatants.some(hasRolled)}
-              title={
-                active.combatants.some(hasRolled)
-                  ? undefined
-                  : "Give someone an initiative roll first"
-              }
-            >
-              Start combat
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            onClick={() => update((e) => ({ ...e, archived: !e.archived }))}
-          >
-            {active.archived ? (
-              <ArchiveRestore className="h-4 w-4" />
+            {live ? (
+              <div className="flex items-center gap-1 rounded-xl border border-border bg-card p-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Previous turn"
+                  title="Previous turn"
+                  onClick={() => update(prevTurn)}
+                >
+                  <ChevronLeft />
+                </Button>
+                <div className="grid justify-items-center px-3 leading-none">
+                  <span className="label-caps text-[9.5px]">Round</span>
+                  <b className="font-mono text-lg font-semibold tabular">{active.round}</b>
+                </div>
+                <Button onClick={() => update(nextTurn)}>
+                  Next turn{" "}
+                  <kbd className="rounded bg-white/20 px-1.5 font-mono text-[10.5px]">Space</kbd>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="End combat"
+                  title="End combat (keeps HP, conditions and initiative)"
+                  onClick={() => update(endCombat)}
+                >
+                  <Square className="h-4 w-4" />
+                </Button>
+              </div>
             ) : (
-              <Archive className="h-4 w-4" />
+              <Button
+                onClick={() => update(startCombat)}
+                disabled={!active.combatants.some(hasRolled)}
+                title={
+                  active.combatants.some(hasRolled)
+                    ? undefined
+                    : "Give someone an initiative roll first"
+                }
+              >
+                Start combat
+              </Button>
             )}
-            {active.archived ? "Reopen" : "Resolve & archive"}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Delete encounter"
-            title="Delete encounter"
-            onClick={() => {
-              if (!confirm(`Delete "${active.name}" permanently?`)) return;
-              setEncounters((all) => all.filter((e) => e.id !== active.id));
-              setActiveId(null);
-              setDrawerId(null);
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-        {active.archived && (
-          <p className="mb-3 text-sm text-muted-foreground">
-            This encounter is archived. You can still edit it.
-          </p>
-        )}
-        <PrepNotes encounter={active} update={update} />
-        <div className="grid gap-4">
-          <InitiativeList
-            encounter={active}
-            update={update}
-            selectedId={drawerId}
-            onSelect={setDrawerId}
-          />
-          <AddCombatant
-            onAdd={(c) => update((e) => ({ ...e, combatants: [...e.combatants, c] }))}
-          />
-        </div>
-      </main>
-      {drawer && (
-        <CreatureDrawer
-          c={drawer}
-          onClose={() => setDrawerId(null)}
-          update={(fn) => updateC(drawer.id, fn)}
-        />
-      )}
-    </div>
+            <Button
+              variant="outline"
+              onClick={() => update((e) => ({ ...e, archived: !e.archived }))}
+            >
+              {active.archived ? (
+                <ArchiveRestore className="h-4 w-4" />
+              ) : (
+                <Archive className="h-4 w-4" />
+              )}
+              {active.archived ? "Reopen" : "Resolve & archive"}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Delete encounter"
+              title="Delete encounter"
+              onClick={() => {
+                if (!confirm(`Delete "${active.name}" permanently?`)) return;
+                setEncounters((all) => all.filter((e) => e.id !== active.id));
+                setActiveId(null);
+                setDrawerId(null);
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+          {active.archived && (
+            <p className="mb-3 text-sm text-muted-foreground">
+              This encounter is archived. You can still edit it.
+            </p>
+          )}
+          <section aria-label="Setting" className="mb-4">
+            <label htmlFor="encounter-setting" className="label-caps">
+              Setting
+            </label>
+            <Textarea
+              id="encounter-setting"
+              aria-label="Setting"
+              value={active.setting ?? ""}
+              placeholder="Where this happens, and what the party sees when they arrive."
+              onChange={(ev) => update((e) => ({ ...e, setting: ev.target.value }))}
+              className="mt-1.5 min-h-28"
+            />
+          </section>
+          <PrepNotes encounter={active} update={update} />
+          <div className="grid gap-4">
+            <InitiativeList
+              encounter={active}
+              update={update}
+              selectedId={drawerId}
+              onSelect={setDrawerId}
+            />
+            <AddCombatant
+              onAdd={(c) => update((e) => ({ ...e, combatants: [...e.combatants, c] }))}
+            />
+          </div>
+        </main>
+      </div>
+    </Stage>
   );
 }

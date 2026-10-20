@@ -2,8 +2,8 @@
 @source "../src";
 @import "tw-animate-css";
 
-/* Dark mode follows the Mac's appearance setting (Electron passes it through). */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+/* Dark mode is the `.dark` class on the document. Auto follows the OS; the settings menu can force either. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /*
  * Design system definition.
@@ -11,7 +11,7 @@
  * The @theme inline block maps CSS custom properties to Tailwind utility
  * classes (e.g. --color-primary -> bg-primary, text-primary).
  *
- * The :root block and its prefers-color-scheme: dark override define the color values using oklch.
+ * The :root block and the .dark override define the color values using oklch.
  * All colors MUST use oklch format.
  *
  * To add a new semantic color:
@@ -121,54 +121,73 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: oklch(0.247 0.025 14.9);
-    --foreground: oklch(0.963 0.002 145.6);
-    --surface: oklch(0.291 0.027 15.2);
-    --card: oklch(0.291 0.027 15.2);
-    --card-foreground: oklch(0.963 0.002 145.6);
-    --popover: oklch(0.291 0.027 15.2);
-    --popover-foreground: oklch(0.963 0.002 145.6);
-    --primary: oklch(0.433 0.157 353.6);
-    --primary-foreground: oklch(1 0 0);
-    --wine-ink: oklch(0.767 0.114 346.4);
-    --secondary: oklch(0.309 0.021 13.5);
-    --secondary-foreground: oklch(0.81 0.034 215.6);
-    --muted: oklch(0.309 0.021 13.5);
-    --muted-foreground: oklch(0.779 0.029 216.5);
-    --accent: oklch(0.323 0.044 351.6);
-    --accent-foreground: oklch(0.963 0.002 145.6);
-    --destructive: oklch(0.675 0.145 30.1);
-    --destructive-foreground: oklch(0.196 0.017 12.1);
-    --border: oklch(0.963 0.002 145.6 / 10%);
-    --input: oklch(0.963 0.002 145.6 / 20%);
-    --ring: oklch(0.767 0.114 346.4);
-    --teal: oklch(0.64 0.043 218.5);
-    --teal-foreground: oklch(0.81 0.034 215.6);
-    --gold: oklch(0.698 0.123 81.5);
-    --gold-foreground: oklch(0.837 0.104 85.8);
-    --bronze: oklch(0.734 0.058 82.8);
-    --sidebar: oklch(0.222 0.021 13.8);
-    --sidebar-foreground: oklch(0.963 0.002 145.6);
-    --sidebar-primary: oklch(0.433 0.157 353.6);
-    --sidebar-primary-foreground: oklch(1 0 0);
-    --sidebar-accent: oklch(0.323 0.044 351.6);
-    --sidebar-accent-foreground: oklch(0.767 0.114 346.4);
-    --sidebar-border: oklch(0.963 0.002 145.6 / 10%);
-    --sidebar-ring: oklch(0.767 0.114 346.4);
-    color-scheme: dark;
-  }
+.dark {
+  --background: oklch(0.247 0.025 14.9);
+  --foreground: oklch(0.963 0.002 145.6);
+  --surface: oklch(0.291 0.027 15.2);
+  --card: oklch(0.291 0.027 15.2);
+  --card-foreground: oklch(0.963 0.002 145.6);
+  --popover: oklch(0.291 0.027 15.2);
+  --popover-foreground: oklch(0.963 0.002 145.6);
+  --primary: oklch(0.433 0.157 353.6);
+  --primary-foreground: oklch(1 0 0);
+  --wine-ink: oklch(0.767 0.114 346.4);
+  --secondary: oklch(0.309 0.021 13.5);
+  --secondary-foreground: oklch(0.81 0.034 215.6);
+  --muted: oklch(0.309 0.021 13.5);
+  --muted-foreground: oklch(0.779 0.029 216.5);
+  --accent: oklch(0.323 0.044 351.6);
+  --accent-foreground: oklch(0.963 0.002 145.6);
+  --destructive: oklch(0.675 0.145 30.1);
+  --destructive-foreground: oklch(0.196 0.017 12.1);
+  --border: oklch(0.963 0.002 145.6 / 10%);
+  --input: oklch(0.963 0.002 145.6 / 20%);
+  --ring: oklch(0.767 0.114 346.4);
+  --teal: oklch(0.64 0.043 218.5);
+  --teal-foreground: oklch(0.81 0.034 215.6);
+  --gold: oklch(0.698 0.123 81.5);
+  --gold-foreground: oklch(0.837 0.104 85.8);
+  --bronze: oklch(0.734 0.058 82.8);
+  --sidebar: oklch(0.222 0.021 13.8);
+  --sidebar-foreground: oklch(0.963 0.002 145.6);
+  --sidebar-primary: oklch(0.433 0.157 353.6);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.323 0.044 351.6);
+  --sidebar-accent-foreground: oklch(0.767 0.114 346.4);
+  --sidebar-border: oklch(0.963 0.002 145.6 / 10%);
+  --sidebar-ring: oklch(0.767 0.114 346.4);
+  color-scheme: dark;
 }
 
 @layer base {
   /* Fonts ship with the app so it looks right offline (SIL OFL, see public/fonts). */
-  @font-face { font-family: "Bricolage Grotesque"; src: url("/fonts/bricolage-grotesque.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
-  @font-face { font-family: "Instrument Sans"; src: url("/fonts/instrument-sans.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
-  @font-face { font-family: "JetBrains Mono"; src: url("/fonts/jetbrains-mono.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
+  @font-face {
+    font-family: "Bricolage Grotesque";
+    src: url("/fonts/bricolage-grotesque.woff2") format("woff2");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Instrument Sans";
+    src: url("/fonts/instrument-sans.woff2") format("woff2");
+    font-weight: 400 700;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "JetBrains Mono";
+    src: url("/fonts/jetbrains-mono.woff2") format("woff2");
+    font-weight: 100 800;
+    font-display: swap;
+  }
 
   * {
     border-color: var(--color-border);
+  }
+
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
   }
 
   body {
@@ -177,11 +196,23 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 { text-wrap: balance; }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
 }
 
 @layer utilities {
   /* Small uppercase section labels in bronze. */
-  .label-caps { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--bronze); }
-  .tabular { font-variant-numeric: tabular-nums; }
+  .label-caps {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--bronze);
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 }

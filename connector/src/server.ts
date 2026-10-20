@@ -6,7 +6,14 @@ import { loadMagicItems } from "@/lib/equipment";
 import { loadLibrary } from "@/lib/monsters";
 import { readKeys, defaultDataDir, writeKeys } from "./dataFile.js";
 import { addLoot, editEncounter, listSessions } from "./edits.js";
-import { planImport, saveSpellbook, upsertNpc, type Plan, type PlanItem, type Uncertain } from "./importer.js";
+import {
+  planImport,
+  saveSpellbook,
+  upsertNpc,
+  type Plan,
+  type PlanItem,
+  type Uncertain,
+} from "./importer.js";
 import { loadCampaigns, pickCampaign, type CampaignView } from "./model.js";
 import { beatSchema, bundleSchema, lootSchema, npcSchema, pcSchema } from "./schema.js";
 import { findEncounter, findLoot, findMonster, findNpc, getParty } from "./tools.js";
@@ -20,8 +27,9 @@ You build encounters, monsters, NPCs and loot in the GM's tracker from their adv
 - Every creature the GM may need to run: a library creature (by name), a library creature with overrides (e.g. hp), or a custom stat block only when the doc prints a full one.
 - Every loot line, linked to the creature group that carries it, or left in the room it sits in.
 - Round-by-round beats, tactics, morale and harvest checks, kept short.
+- The setting: one short paragraph of where the scene is and what the GM needs to see at the table. Put it on the encounter as \`setting\`.
 - Every creature with a proper name goes on the NPC list, with or without stats. Unnamed roles stay off it.
-- Do NOT import read-aloud text, lore, negotiation paths, skill-check chains or long clocks. Leave them in the doc.
+- Do NOT import the rest of the read-aloud, lore, negotiation paths, skill-check chains or long clocks. Leave them in the doc.
 
 ## Rules
 1. Search before you create. Call find_npc, find_encounter, find_monster and find_loot first, and treat entries the GM added by hand as canon. import_session also checks, and reuses exact matches instead of duplicating.
@@ -248,7 +256,9 @@ export function createServer(opts: { dataDir?: string } = {}) {
         saved: true,
         campaign: c.name,
         result: items,
-        ...(npc.spellbook?.length ? { spellbook: `${npc.spellbook.length - notInSrd.length} linked`, notInSrd } : {}),
+        ...(npc.spellbook?.length
+          ? { spellbook: `${npc.spellbook.length - notInSrd.length} linked`, notInSrd }
+          : {}),
       };
     },
   );
@@ -277,14 +287,16 @@ export function createServer(opts: { dataDir?: string } = {}) {
         saved: true,
         campaign: c.name,
         result: items,
-        ...(pc.spellbook?.length ? { spellbook: `${pc.spellbook.length - notInSrd.length} linked`, notInSrd } : {}),
+        ...(pc.spellbook?.length
+          ? { spellbook: `${pc.spellbook.length - notInSrd.length} linked`, notInSrd }
+          : {}),
       };
     },
   );
 
   register(
     "update_encounter",
-    "Change one prepared encounter right away: rename it, set location, status (staged/dormant) and trigger, tactics, morale, replace its round beats, or change a creature group's count, count note or when it joins. Use only for a small edit the GM asked for.",
+    "Change one prepared encounter right away: rename it, set its setting description, location, status (staged/dormant) and trigger, tactics, morale, replace its round beats, or change a creature group's count, count note or when it joins. Use only for a small edit the GM asked for.",
     {
       encounter: z.string().describe("Encounter name or alias"),
       name: z.string().optional(),
@@ -293,6 +305,10 @@ export function createServer(opts: { dataDir?: string } = {}) {
       trigger: z.string().optional(),
       tactics: z.string().optional(),
       morale: z.string().optional(),
+      setting: z
+        .string()
+        .optional()
+        .describe("Replaces the setting description at the top of the encounter"),
       beats: z.array(beatSchema).optional().describe("Replaces all round beats"),
       groups: z
         .array(

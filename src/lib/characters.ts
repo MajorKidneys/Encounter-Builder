@@ -60,6 +60,8 @@ export type Character = {
   aliases?: string[] | undefined;
   /** Where they first appear, e.g. "Winwoods S1 - U3". */
   firstAppearance?: string | undefined;
+  /** Marked dead. Stays on the sheet so the party list can show it outside a fight. */
+  dead?: boolean | undefined;
 };
 
 const ABS = 6;
@@ -218,6 +220,7 @@ export function coerceCharacter(value: unknown): Character | null {
       ? { aliases: raw.aliases.filter((a): a is string => typeof a === "string") }
       : {}),
     ...(typeof raw.firstAppearance === "string" ? { firstAppearance: raw.firstAppearance } : {}),
+    ...(raw.dead === true ? { dead: true } : {}),
   };
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Minus, Plus, X } from "lucide-react";
-import { type Combatant, lootTotalGp, makeUnits } from "@/lib/encounters";
+import { setCombatantQty, type Combatant, lootTotalGp } from "@/lib/encounters";
 import { immunities, setConditions, unitLabel } from "@/lib/turns";
 import { MonsterPanel } from "@/components/MonsterPanel";
 import { GearLoot } from "@/components/GearLoot";
@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { drawerPanelClass } from "@/components/Stage";
+import { Tombstone } from "@/components/Tombstone";
 import { useWorkspace } from "@/components/Workspace";
 import { CharacterUses } from "@/components/party/CharacterUses";
 import { ConditionChips } from "./ConditionChips";
@@ -29,32 +31,28 @@ export function CreatureDrawer({
   update: (fn: (c: Combatant) => Combatant) => void;
 }) {
   const { characters, setCharacters } = useWorkspace();
-  const saved = characters.find((person) => person.id === c.characterId) ?? null;
+  const saved = characters.find((person) => person.id === (c.characterId ?? c.npcId)) ?? null;
+  const markedDead = Boolean(saved?.dead || c.dead);
   const [unitIdx, setUnitIdx] = useState(0);
   useEffect(() => setUnitIdx(0), [c.id]);
   const idx = Math.min(unitIdx, c.units.length - 1);
   const unit = c.units[idx];
   const src = statSource(c);
   const total = lootTotalGp(c.currency);
-  const setQty = (q: number) =>
-    update((x) => {
-      const qty = Math.max(1, q);
-      return {
-        ...x,
-        qty,
-        units:
-          qty > x.units.length
-            ? [...x.units, ...makeUnits(qty - x.units.length, x.maxHp)]
-            : x.units.slice(0, qty),
-      };
-    });
+  const setQty = (q: number) => update((x) => setCombatantQty(x, q));
+  const toggleDead = () => {
+    if (saved) {
+      const dead = !saved.dead;
+      setCharacters((all) =>
+        all.map((person) => (person.id === saved.id ? { ...person, dead } : person)),
+      );
+      return;
+    }
+    update((x) => ({ ...x, dead: !x.dead }));
+  };
 
   return (
-    <aside
-      data-drawer-panel
-      aria-label={`${c.name} details`}
-      className="flex w-[27rem] shrink-0 flex-col border-l border-border bg-background shadow-[-18px_0_40px_-28px_rgba(0,0,0,.45)]"
-    >
+    <aside data-drawer-panel aria-label={`${c.name} details`} className={drawerPanelClass}>
       <div className="grid gap-3 border-b border-border px-5 pb-3.5 pt-4">
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
@@ -99,6 +97,18 @@ export function CreatureDrawer({
             <Switch checked={c.isPC} onCheckedChange={(v) => update((x) => ({ ...x, isPC: v }))} />{" "}
             Player character
           </label>
+          {(c.isPC || saved) && (
+            <Button
+              type="button"
+              variant={markedDead ? "secondary" : "outline"}
+              size="sm"
+              aria-pressed={markedDead}
+              onClick={toggleDead}
+            >
+              <Tombstone />
+              {markedDead ? "Dead" : "Mark dead"}
+            </Button>
+          )}
           <span className="flex items-center gap-1.5">
             Copies
             <span className="inline-flex items-center rounded-md border border-input">

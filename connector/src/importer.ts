@@ -217,7 +217,11 @@ const spellKey = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
 /** Sheet fields the connector sends. Only fields that were sent change, so hand edits survive. */
 function applySheet(c: Character, n: NpcInput): string[] {
   const changed: string[] = [];
-  const set = <K extends keyof Character>(key: K, value: Character[K] | undefined, label: string) => {
+  const set = <K extends keyof Character>(
+    key: K,
+    value: Character[K] | undefined,
+    label: string,
+  ) => {
     if (value === undefined || JSON.stringify(c[key]) === JSON.stringify(value)) return;
     c[key] = value;
     changed.push(label);
@@ -230,12 +234,20 @@ function applySheet(c: Character, n: NpcInput): string[] {
   set("saves", n.saves, "saves");
   set("passive", n.passive, "passive perception");
   set("senses", n.senses, "senses");
-  set("attacks", n.attacks?.map((a) => ({ id: uid(), ...a })), "attacks");
+  set(
+    "attacks",
+    n.attacks?.map((a) => ({ id: uid(), ...a })),
+    "attacks",
+  );
   set("spellAbility", n.spellAbility, "spell ability");
   set("spellDc", n.spellDc, "spell DC");
   set("spellAttack", n.spellAttack, "spell attack");
   set("prepared", n.prepared, "prepared spells");
-  set("gear", n.gear?.map((g) => ({ id: uid(), name: g.name, note: g.note ?? "" })), "gear");
+  set(
+    "gear",
+    n.gear?.map((g) => ({ id: uid(), name: g.name, note: g.note ?? "" })),
+    "gear",
+  );
   set(
     "resources",
     n.resources?.map((r) => ({
@@ -335,7 +347,9 @@ export function upsertNpc(
       kind: "npc",
       action: changed.length ? "update" : "reuse",
       name: exact.name,
-      detail: changed.length ? `added ${changed.join(", ")}` : `already on the ${role === "pc" ? "party" : "NPC"} list`,
+      detail: changed.length
+        ? `added ${changed.join(", ")}`
+        : `already on the ${role === "pc" ? "party" : "NPC"} list`,
     });
     return exact;
   }
@@ -378,7 +392,8 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
     const saved = upsertNpc(characters, n, bundle.session, items, uncertain);
     if (saved && n.spellbook?.length) {
       const missing = saveSpellbook(spellLists, saved.name, n.spellbook, ctx.spells);
-      if (missing.length) gaps.push(`${saved.name}: not in the SRD spell list, name only: ${missing.join(", ")}`);
+      if (missing.length)
+        gaps.push(`${saved.name}: not in the SRD spell list, name only: ${missing.join(", ")}`);
     }
   }
 
@@ -414,13 +429,13 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
     if (isNew) encounters.push(enc);
 
     const filled: string[] = [];
-    const fill = <K extends "location" | "trigger" | "tactics" | "morale">(key: K) => {
+    const fill = <K extends "location" | "trigger" | "tactics" | "morale" | "setting">(key: K) => {
       if (e[key] && !enc[key]) {
         enc[key] = e[key];
         filled.push(key);
       }
     };
-    (["location", "trigger", "tactics", "morale"] as const).forEach(fill);
+    (["location", "trigger", "tactics", "morale", "setting"] as const).forEach(fill);
     if (!enc.session) enc.session = bundle.session;
     if (e.status && !enc.status) enc.status = e.status;
     if (e.beats?.length && !enc.beats?.length) {

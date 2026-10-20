@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/components/Workspace";
 import { CharacterDrawer } from "@/components/party/CharacterDrawer";
+import { Stage } from "@/components/Stage";
+import { Tombstone } from "@/components/Tombstone";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/party")({
@@ -49,46 +51,55 @@ function PartyPage() {
   };
 
   return (
-    <div className="flex min-w-0 flex-1">
-      <main className="min-w-0 flex-1 overflow-auto px-7 pb-8 pt-6">
-        <h1 className="font-display text-[28px] font-bold leading-tight tracking-tight">Party</h1>
-        <p className="mt-1 max-w-xl text-[12.5px] text-muted-foreground">
-          Names and rest only. Slots and uses stay on the open character. A new sheet replaces that
-          character when import arrives. Drag a name into an encounter.
-        </p>
-        <Roster
-          title="Party"
-          people={pcs}
-          selectedId={selected?.id ?? null}
-          empty="No player characters yet."
-          onOpen={open}
-          onAdd={() => add("pc")}
-          addLabel="New character"
-          onRest={(person, rest) => update(rest === "short" ? shortRest(person) : longRest(person))}
-        />
-        <Roster
-          title="NPCs"
-          people={npcs}
-          selectedId={selected?.id ?? null}
-          empty="No NPCs yet. They use race, class, and level, just like the party."
-          onOpen={open}
-          onAdd={() => add("npc")}
-          addLabel="New NPC"
-          onRest={(person, rest) => update(rest === "short" ? shortRest(person) : longRest(person))}
-        />
-      </main>
-      {selected && (
-        <CharacterDrawer
-          character={selected}
-          onChange={update}
-          onClose={() => open(null)}
-          onDelete={() => {
-            setCharacters((all) => all.filter((c) => c.id !== selected.id));
-            open(null);
-          }}
-        />
-      )}
-    </div>
+    <Stage
+      drawer={
+        selected && (
+          <CharacterDrawer
+            character={selected}
+            onChange={update}
+            onClose={() => open(null)}
+            onDelete={() => {
+              setCharacters((all) => all.filter((c) => c.id !== selected.id));
+              open(null);
+            }}
+          />
+        )
+      }
+    >
+      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-y-contain px-7 pb-8 pt-6">
+          <h1 className="font-display text-[28px] font-bold leading-tight tracking-tight">Party</h1>
+          <p className="mt-1 max-w-xl text-[12.5px] text-muted-foreground">
+            Names and rest only. Slots and uses stay on the open character. A new sheet replaces
+            that character when import arrives. Drag a name into an encounter.
+          </p>
+          <Roster
+            title="Party"
+            people={pcs}
+            selectedId={selected?.id ?? null}
+            empty="No player characters yet."
+            onOpen={open}
+            onAdd={() => add("pc")}
+            addLabel="New character"
+            onRest={(person, rest) =>
+              update(rest === "short" ? shortRest(person) : longRest(person))
+            }
+          />
+          <Roster
+            title="NPCs"
+            people={npcs}
+            selectedId={selected?.id ?? null}
+            empty="No NPCs yet. They use race, class, and level, just like the party."
+            onOpen={open}
+            onAdd={() => add("npc")}
+            addLabel="New NPC"
+            onRest={(person, rest) =>
+              update(rest === "short" ? shortRest(person) : longRest(person))
+            }
+          />
+        </main>
+      </div>
+    </Stage>
   );
 }
 
@@ -103,7 +114,7 @@ function Roster({
   onRest,
 }: {
   title: string;
-  people: { id: string; name: string; race: string; classes: string }[];
+  people: { id: string; name: string; race: string; classes: string; dead?: boolean | undefined }[];
   selectedId: string | null;
   empty: string;
   onOpen: (id: string) => void;
@@ -148,7 +159,15 @@ function Roster({
                     if (e.key === "Enter") onOpen(person.id);
                   }}
                 >
-                  <b className="block truncate">{person.name}</b>
+                  <b className="flex min-w-0 items-center gap-1.5">
+                    {person.dead && (
+                      <span title="Dead" className="shrink-0 text-muted-foreground">
+                        <Tombstone />
+                        <span className="sr-only">Dead</span>
+                      </span>
+                    )}
+                    <span className="truncate">{person.name}</span>
+                  </b>
                   <span className="text-[12.5px] text-muted-foreground">{identity(person)}</span>
                 </div>
                 <div className="flex shrink-0 gap-2">

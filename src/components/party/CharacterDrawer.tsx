@@ -12,6 +12,8 @@ import { uid } from "@/lib/encounters";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { drawerPanelClass } from "@/components/Stage";
+import { Tombstone } from "@/components/Tombstone";
 import { CharacterUses } from "./CharacterUses";
 
 const ABS = ["Str", "Dex", "Con", "Int", "Wis", "Cha"];
@@ -37,10 +39,7 @@ export function CharacterDrawer({
     set({ resources: character.resources.map((r) => (r.id === id ? { ...r, ...patch } : r)) });
 
   return (
-    <aside
-      aria-label={`${character.name} details`}
-      className="flex w-[27rem] shrink-0 flex-col border-l border-border bg-background"
-    >
+    <aside data-drawer-panel aria-label={`${character.name} details`} className={drawerPanelClass}>
       <div className="grid gap-3 border-b border-border px-5 pb-3.5 pt-4">
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
@@ -58,6 +57,16 @@ export function CharacterDrawer({
           </Button>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant={character.dead ? "secondary" : "outline"}
+            size="sm"
+            aria-pressed={Boolean(character.dead)}
+            onClick={() => set({ dead: !character.dead })}
+          >
+            <Tombstone />
+            {character.dead ? "Dead" : "Mark dead"}
+          </Button>
           <Button
             type="button"
             variant="outline"
@@ -353,7 +362,7 @@ export function CharacterDrawer({
           aria-label="Notes"
           value={character.notes}
           onChange={(e) => set({ notes: e.target.value })}
-          className="min-h-20"
+          className="min-h-64"
         />
       </div>
     </aside>

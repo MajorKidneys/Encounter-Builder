@@ -127,6 +127,12 @@ export const encounterSchema = z.object({
   trigger: z.string().optional(),
   tactics: z.string().optional(),
   morale: z.string().optional(),
+  setting: z
+    .string()
+    .optional()
+    .describe(
+      "One paragraph the GM reads at the table: where they are and what is immediately visible. Not the whole read-aloud or the room's lore.",
+    ),
   beats: z.array(beatSchema).optional(),
   groups: z.array(groupSchema).default([]),
   loot: z
@@ -180,7 +186,9 @@ export const npcSchema = z.object({
     .optional()
     .describe("Spell names the NPC has ready (cantrips included). Replaces the prepared list."),
   slots: z
-    .array(z.object({ level: z.number().int().min(1).max(9), count: z.number().int().min(1).max(9) }))
+    .array(
+      z.object({ level: z.number().int().min(1).max(9), count: z.number().int().min(1).max(9) }),
+    )
     .optional()
     .describe("Spell slots per level, e.g. [{level:1,count:4}]. Replaces the NPC's slots."),
   spellbook: z
@@ -199,7 +207,11 @@ export const npcSchema = z.object({
         name: z.string().describe('e.g. "Channel Divinity"'),
         max: z.number().int().min(1),
         current: z.number().int().min(0).optional().describe("Defaults to max"),
-        reset: z.enum(["short", "long"]).nullable().optional().describe("Rest that refills it; null or omitted = manual"),
+        reset: z
+          .enum(["short", "long"])
+          .nullable()
+          .optional()
+          .describe("Rest that refills it; null or omitted = manual"),
       }),
     )
     .optional()

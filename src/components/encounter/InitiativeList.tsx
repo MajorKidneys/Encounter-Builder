@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link2, X } from "lucide-react";
+import { Link2, Minus, Plus, X } from "lucide-react";
 import { toast } from "sonner";
-import { type Combatant, type Encounter } from "@/lib/encounters";
+import { setCombatantQty, type Combatant, type Encounter } from "@/lib/encounters";
 import {
   actNow,
   applyHp,
@@ -10,6 +10,7 @@ import {
   immunities,
   isDown,
   isLive,
+  isUnitDead,
   removeCombatant,
   rollInitiative,
   setConditions,
@@ -18,6 +19,8 @@ import {
 } from "@/lib/turns";
 import { joinsLabel } from "@/lib/prep";
 import { Button } from "@/components/ui/button";
+import { Tombstone } from "@/components/Tombstone";
+import { useWorkspace } from "@/components/Workspace";
 import { cn } from "@/lib/utils";
 import { ConditionChips } from "./ConditionChips";
 import { DamageHeal, HpMeter } from "./HpControls";
@@ -125,10 +128,23 @@ function CombatantRow({
   update: (fn: (e: Encounter) => Encounter) => void;
   updateC: (id: string, fn: (c: Combatant) => Combatant) => void;
 }) {
+  const { characters, setCharacters } = useWorkspace();
   const live = isLive(encounter);
   const active = live && encounter.turnId === c.id;
   const src = statSource(c);
   const immune = immunities(c);
+  const saved = characters.find((person) => person.id === (c.characterId ?? c.npcId)) ?? null;
+  const markedDead = Boolean(saved?.dead || c.dead);
+  const rememberDeath = (before: Combatant, next: Combatant) => {
+    const id = before.characterId ?? before.npcId;
+    if (!id || next.isPC || next.maxHp === null) return;
+    const wasDead = before.units.length > 0 && before.units.every((u) => u.hp <= 0);
+    const nowDead = next.units.length > 0 && next.units.every((u) => u.hp <= 0);
+    if (wasDead === nowDead) return;
+    setCharacters((all) =>
+      all.map((person) => (person.id === id ? { ...person, dead: nowDead } : person)),
+    );
+  };
   return (
     <div
       role="row"
@@ -181,6 +197,39 @@ function CombatantRow({
                   >
                     {label}
                   </button>
+                  {(isUnitDead(c, u) || (i === 0 && markedDead)) && (
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <Tombstone />
+                      Dead
+                    </span>
+                  )}
+                  {i === 0 && !c.isPC && (
+                    <span className="inline-flex shrink-0 items-center rounded-md border border-input">
+                      <button
+                        type="button"
+                        aria-label={`Fewer ${c.name}`}
+                        title="Fewer copies"
+                        disabled={c.units.length <= 1}
+                        onClick={() => updateC(c.id, (x) => setCombatantQty(x, x.units.length - 1))}
+                        className="grid h-6 w-6 place-items-center text-muted-foreground hover:bg-accent disabled:opacity-40"
+                      >
+                        <Minus className="h-3 w-3" />
+                      </button>
+                      <span className="w-5 text-center font-mono text-[11px] tabular">
+                        {c.units.length}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label={`More ${c.name}`}
+                        title="More copies"
+                        disabled={c.units.length >= 50}
+                        onClick={() => updateC(c.id, (x) => setCombatantQty(x, x.units.length + 1))}
+                        className="grid h-6 w-6 place-items-center text-muted-foreground hover:bg-accent disabled:opacity-40"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
                   {i === 0 && src && (
                     <span
                       className="inline-flex items-center gap-1 text-xs text-muted-foreground"
@@ -234,6 +283,7 @@ function CombatantRow({
                     onApply={(delta) => {
                       const { combatant, result } = applyHp(c, u.id, delta);
                       updateC(c.id, () => combatant);
+                      rememberDeath(c, combatant);
                       if (result?.concentrationDc)
                         toast(`Concentration save: DC ${result.concentrationDc}`, {
                           description: `${label} took ${delta} damage. Con save to keep concentrating.`,

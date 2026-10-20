@@ -100,8 +100,8 @@ function SpellsPage() {
   const conc = list ? results.filter((s) => s.conc).length : 0;
 
   return (
-    <div className="flex min-w-0 flex-1">
-      <main className="flex w-80 shrink-0 flex-col border-r border-border lg:w-[23rem]">
+    <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
+      <main className="flex min-h-0 w-80 shrink-0 flex-col border-r border-border lg:w-[23rem]">
         <div className="grid gap-2.5 border-b border-border p-4">
           {list ? (
             <>
@@ -247,7 +247,7 @@ function SpellsPage() {
         </ul>
       </main>
 
-      <section className="min-w-0 flex-1 overflow-y-auto px-8 py-7">
+      <section className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-y-contain px-8 py-7">
         {sel ? (
           <Detail s={sel} lists={lists} toggle={toggle} onNewList={() => newList(sel.id)} />
         ) : (
