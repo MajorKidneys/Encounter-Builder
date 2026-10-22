@@ -115,7 +115,11 @@ export function CampaignSwitcher({
           />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-60" onCloseAutoFocus={(e) => e.preventDefault()}>
+      <DropdownMenuContent
+        align="start"
+        className="w-60"
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <DropdownMenuLabel className="label-caps font-normal">Switch campaign</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={activeId ?? ""} onValueChange={onChoose}>
           {campaigns.map((c) => (
