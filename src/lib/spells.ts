@@ -48,3 +48,21 @@ export function parseList(list: string, spells: Spell[] | null): SpellEntry[] {
 export const levelLabel = (l: number) => (l === 0 ? "Cantrips" : `${l}${["st", "nd", "rd"][l - 1] ?? "th"} level`);
 
 export type SpellList = { id: string; name: string; spellIds: string[] };
+
+export type SpellFilters = { q: string; level: string; cls: string };
+
+/** A saved list shows exactly its spells. Search and filters belong to the Spell Book only. */
+export function visibleSpells(
+  spells: Spell[],
+  list: SpellList | null,
+  { q, level, cls }: SpellFilters,
+): Spell[] {
+  if (list) return spells.filter((s) => list.spellIds.includes(s.id));
+  const needle = q.toLowerCase();
+  return spells.filter(
+    (s) =>
+      (!q || s.name.toLowerCase().includes(needle)) &&
+      (level === "" || s.level === Number(level)) &&
+      (!cls || s.classes.includes(cls)),
+  );
+}
