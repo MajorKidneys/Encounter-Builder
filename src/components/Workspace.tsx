@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Archive,
@@ -10,7 +10,6 @@ import {
   Plus,
   Settings,
   Swords,
-  Trash2,
   Users,
 } from "lucide-react";
 import { uid, type Encounter } from "@/lib/encounters";
@@ -21,12 +20,12 @@ import {
   makeCharacter,
   type CharacterRole,
 } from "@/lib/characters";
-import { DEFAULT_CAMPAIGN_NAME, useCampaignStore } from "@/lib/campaigns";
+import { useCampaignStore } from "@/lib/campaigns";
+import { CampaignSwitcher } from "@/components/CampaignSwitcher";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { ReferenceProvider, useReference } from "@/components/reference/ReferenceLayer";
-import { Textarea } from "@/components/ui/textarea";
 import { applyTheme, readTheme, writeTheme, type ThemeChoice } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -51,7 +50,6 @@ export function Workspace({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(true);
   const [theme, setTheme] = useState<ThemeChoice>("auto");
   const [renameArmed, setRenameArmed] = useState(false);
-  const nameRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
   const location = useRouterState({ select: (s) => s.location });
   const isSpells = location.pathname === "/spells";
@@ -71,13 +69,6 @@ export function Workspace({ children }: { children: ReactNode }) {
     media.addEventListener("change", onChange);
     return () => media.removeEventListener("change", onChange);
   }, []);
-
-  useEffect(() => {
-    if (!renameArmed || !campaigns.ready) return;
-    nameRef.current?.focus();
-    nameRef.current?.select();
-    setRenameArmed(false);
-  }, [renameArmed, campaigns.ready, campaigns.campaignId]);
 
   const leaveScopedPage = () => {
     if (isSpells) void navigate({ to: "/spells", search: {} });
@@ -169,51 +160,19 @@ export function Workspace({ children }: { children: ReactNode }) {
                       >
                         <Plus />
                       </Button>
-                      {campaigns.campaigns.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
-                          aria-label="Delete campaign"
-                          title="Delete campaign"
-                          onClick={deleteCampaign}
-                        >
-                          <Trash2 />
-                        </Button>
-                      )}
                     </div>
                   </div>
-                  <select
-                    aria-label="Campaign"
-                    className="mt-1 h-8 w-full rounded-md border border-input bg-card px-2 text-sm"
-                    value={campaigns.campaignId ?? ""}
-                    disabled={!campaigns.ready}
-                    onChange={(e) => chooseCampaign(e.target.value)}
-                  >
-                    {campaigns.campaigns.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name || "Untitled campaign"}
-                      </option>
-                    ))}
-                  </select>
-                  <Textarea
-                    ref={nameRef}
-                    aria-label="Campaign name"
-                    value={campaigns.campaign?.name ?? ""}
-                    rows={2}
-                    disabled={!campaigns.ready}
-                    onChange={(e) => campaigns.renameCampaign(e.target.value.replace(/\n/g, " "))}
-                    onBlur={() => {
-                      if (campaigns.ready && !campaigns.campaign?.name.trim())
-                        campaigns.renameCampaign(DEFAULT_CAMPAIGN_NAME);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        e.currentTarget.blur();
-                      }
-                    }}
-                    className="mt-1 min-h-0 w-full resize-none border-transparent bg-transparent px-1 py-0.5 font-display text-lg font-semibold leading-6 shadow-none hover:border-input focus-visible:border-primary focus-visible:ring-0 disabled:opacity-100 md:text-lg"
+                  <CampaignSwitcher
+                    ready={campaigns.ready}
+                    campaigns={campaigns.campaigns}
+                    activeId={campaigns.campaignId}
+                    name={campaigns.campaign?.name ?? ""}
+                    renameArmed={renameArmed}
+                    onRenameArmed={() => setRenameArmed(false)}
+                    onChoose={chooseCampaign}
+                    onRename={campaigns.renameCampaign}
+                    onCreate={createCampaign}
+                    onDelete={deleteCampaign}
                   />
                 </div>
               )}
