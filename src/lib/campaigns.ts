@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 
 import { uid, type Encounter } from "./encounters";
 import { coerceCharacter, type Character } from "./characters";
 import { type SpellList } from "./spells";
+import { type EncounterFolder } from "./folders";
 import { storageReady, storeAdapter, subscribeAny } from "./store";
 
 /** Directory of campaigns. Encounter, spell-list, and party data live in per-campaign keys. */
@@ -16,6 +17,7 @@ export type CampaignData = {
   encounters: Encounter[];
   spellLists: SpellList[];
   characters: Character[];
+  folders: EncounterFolder[];
 };
 export type CampaignStore = {
   activeId: string;
@@ -23,7 +25,10 @@ export type CampaignStore = {
   data: Record<string, CampaignData>;
 };
 
-export function campaignDataKey(id: string, part: "encounters" | "spell-lists" | "characters") {
+export function campaignDataKey(
+  id: string,
+  part: "encounters" | "spell-lists" | "characters" | "folders",
+) {
   return `dm-c-${id}-${part}`;
 }
 
@@ -51,11 +56,22 @@ export function emptySpellLists(): SpellList[] {
 }
 
 export function blankCampaignData(): CampaignData {
-  return { encounters: [], spellLists: emptySpellLists(), characters: [] };
+  return { encounters: [], spellLists: emptySpellLists(), characters: [], folders: [] };
 }
 
 function asArray<T>(value: unknown): T[] | null {
   return Array.isArray(value) ? (value as T[]) : null;
+}
+
+function isFolder(value: unknown): value is EncounterFolder {
+  if (!value || typeof value !== "object") return false;
+  const f = value as EncounterFolder;
+  return (
+    typeof f.id === "string" &&
+    typeof f.name === "string" &&
+    (typeof f.parentId === "string" || f.parentId === null) &&
+    typeof f.sort === "number"
+  );
 }
 
 function readData(storage: Storage, id: string): CampaignData {
@@ -65,7 +81,10 @@ function readData(storage: Storage, id: string): CampaignData {
   const characters = (asArray<unknown>(readJson(storage, campaignDataKey(id, "characters"))) ?? [])
     .map(coerceCharacter)
     .filter((c): c is Character => c !== null);
-  return { encounters, spellLists, characters };
+  const folders = (
+    asArray<unknown>(readJson(storage, campaignDataKey(id, "folders"))) ?? []
+  ).filter(isFolder);
+  return { encounters, spellLists, characters, folders };
 }
 
 function legacyStore(storage: Storage): CampaignStore {
@@ -77,7 +96,7 @@ function legacyStore(storage: Storage): CampaignStore {
   return {
     activeId: id,
     campaigns: [{ id, name, createdAt: Date.now() }],
-    data: { [id]: { encounters, spellLists, characters: [] } },
+    data: { [id]: { encounters, spellLists, characters: [], folders: [] } },
   };
 }
 
@@ -109,6 +128,7 @@ export function saveCampaignStore(storage: Storage, store: CampaignStore) {
     storage.setItem(campaignDataKey(campaign.id, "encounters"), JSON.stringify(data.encounters));
     storage.setItem(campaignDataKey(campaign.id, "spell-lists"), JSON.stringify(data.spellLists));
     storage.setItem(campaignDataKey(campaign.id, "characters"), JSON.stringify(data.characters));
+    storage.setItem(campaignDataKey(campaign.id, "folders"), JSON.stringify(data.folders));
   }
 }
 
@@ -116,6 +136,7 @@ export function removeCampaignData(storage: Storage, id: string) {
   storage.removeItem(campaignDataKey(id, "encounters"));
   storage.removeItem(campaignDataKey(id, "spell-lists"));
   storage.removeItem(campaignDataKey(id, "characters"));
+  storage.removeItem(campaignDataKey(id, "folders"));
 }
 
 export function campaignName(campaigns: CampaignMeta[], fallback: string) {
@@ -220,6 +241,8 @@ export function useCampaignStore() {
     setLists: setSlice("spellLists"),
     characters: active?.characters ?? [],
     setCharacters: setSlice("characters"),
+    folders: active?.folders ?? [],
+    setFolders: setSlice("folders"),
     selectCampaign: (id: string) => {
       const prev = storeRef.current;
       if (!prev || !prev.campaigns.some((c) => c.id === id)) return;

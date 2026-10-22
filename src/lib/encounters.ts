@@ -79,6 +79,10 @@ export type Encounter = {
   /** Scene description the GM reads at the table: where this is and what is in front of them. */
   setting?: string | undefined;
   aliases?: string[] | undefined;
+  /** Folder this encounter sits in. Missing means top level. */
+  folderId?: string | null | undefined;
+  /** Position among its siblings (folders and encounters share one order). Missing falls back to list order. */
+  sort?: number | undefined;
   /** 0 or missing = combat not started. */
   round?: number | undefined;
   /** Combatant whose turn it is. */
