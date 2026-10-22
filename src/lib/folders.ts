@@ -310,3 +310,7 @@ export function ancestorFolderIds(
   }
   return ids;
 }
+
+/** A sort value that places a new item last under `parentId`. */
+export const nextSort = (state: FolderState, parentId: string | null) =>
+  siblingsOf(state, parentId).reduce((m, s) => Math.max(m, s.sort), 0) + 1;

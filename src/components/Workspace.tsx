@@ -7,6 +7,7 @@ import {
   Library,
   PanelLeftClose,
   PanelLeftOpen,
+  FolderPlus,
   Plus,
   Settings,
   Swords,
@@ -22,6 +23,8 @@ import {
 } from "@/lib/characters";
 import { useCampaignStore } from "@/lib/campaigns";
 import { CampaignSwitcher } from "@/components/CampaignSwitcher";
+import { EncounterTree } from "@/components/EncounterTree";
+import { nextSort } from "@/lib/folders";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
@@ -50,6 +53,7 @@ export function Workspace({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(true);
   const [theme, setTheme] = useState<ThemeChoice>("auto");
   const [renameArmed, setRenameArmed] = useState(false);
+  const [folderSignal, setFolderSignal] = useState(0);
   const navigate = useNavigate();
   const location = useRouterState({ select: (s) => s.location });
   const isSpells = location.pathname === "/spells";
@@ -100,18 +104,25 @@ export function Workspace({ children }: { children: ReactNode }) {
     setActiveId(null);
     leaveScopedPage();
   };
-  const newEncounter = () => {
+  const createEncounter = (folderId: string | null = null) => {
+    const sort = nextSort(
+      { folders: campaigns.folders, encounters: campaigns.encounters },
+      folderId,
+    );
     const encounter: Encounter = {
       id: uid(),
       name: `Encounter ${campaigns.encounters.length + 1}`,
       archived: false,
       createdAt: Date.now(),
       combatants: [],
+      ...(folderId ? { folderId } : {}),
+      sort,
     };
     campaigns.setEncounters((all) => [...all, encounter]);
     setActiveId(encounter.id);
     void navigate({ to: "/" });
   };
+  const newEncounter = () => createEncounter();
   const addCharacter = (role: CharacterRole) => {
     const created = makeCharacter(role);
     campaigns.setCharacters((all) => [...all, created]);
@@ -189,43 +200,33 @@ export function Workspace({ children }: { children: ReactNode }) {
             </div>
             {open ? (
               <nav className="flex-1 overflow-y-auto px-3 py-4">
-                <h2 className="label-caps mb-1.5 px-2.5">Encounters</h2>
-                {campaigns.encounters.length === 0 && (
-                  <p className="px-2 text-sm text-muted-foreground">No encounters yet.</p>
-                )}
-                <ul className="space-y-1">
-                  {campaigns.encounters.map((e) => (
-                    <li key={e.id}>
-                      <Button
-                        asChild
-                        variant="ghost"
-                        className={cn(
-                          navClass,
-                          !isSpells && active?.id === e.id ? activeClass : inactiveClass,
-                          e.archived && "text-muted-foreground",
-                        )}
-                      >
-                        <Link
-                          to="/"
-                          onClick={() => setActiveId(e.id)}
-                          aria-current={!isSpells && active?.id === e.id ? "page" : undefined}
-                        >
-                          <span className="min-w-0 truncate">{e.name}</span>
-                          {e.archived ? (
-                            <Archive className="text-muted-foreground" />
-                          ) : (e.round ?? 0) > 0 ? (
-                            <span
-                              className="font-mono text-[10.5px] text-wine-ink"
-                              title={`Round ${e.round}`}
-                            >
-                              R{e.round}
-                            </span>
-                          ) : null}
-                        </Link>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
+                <div className="mb-1.5 flex items-center justify-between px-2.5">
+                  <h2 className="label-caps">Encounters</h2>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="-my-1 h-7 w-7"
+                    aria-label="New folder"
+                    title="New folder"
+                    onClick={() => setFolderSignal((n) => n + 1)}
+                  >
+                    <FolderPlus />
+                  </Button>
+                </div>
+                <EncounterTree
+                  folders={campaigns.folders}
+                  encounters={campaigns.encounters}
+                  setFolders={campaigns.setFolders}
+                  setEncounters={campaigns.setEncounters}
+                  activeId={active?.id}
+                  showActive={!isSpells && !isParty}
+                  onSelect={setActiveId}
+                  onCreateEncounter={createEncounter}
+                  newFolderSignal={folderSignal}
+                  navClass={navClass}
+                  activeClass={activeClass}
+                  inactiveClass={inactiveClass}
+                />
                 <Button
                   variant="ghost"
                   className="mt-1 w-full justify-start px-2.5 font-normal text-muted-foreground"
