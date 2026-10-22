@@ -1,5 +1,6 @@
 import { type Combatant, type Condition, type Encounter, type Unit, uid } from "./encounters";
 import type { ResetOn } from "./monsters";
+import { conditionEntryId, getEntry } from "./reference";
 
 /** Standard 5e conditions plus the two the table tracks constantly. */
 export const CONDITIONS = [
@@ -21,27 +22,10 @@ export const CONDITIONS = [
   "Concentrating",
 ] as const;
 
-export const CONDITION_RULES: Record<string, string> = {
-  Blinded: "Can't see. Attacks against it have advantage; its attacks have disadvantage.",
-  Charmed: "Can't attack the charmer. The charmer has advantage on social checks against it.",
-  Deafened: "Can't hear. Fails checks that rely on hearing.",
-  Frightened:
-    "Disadvantage on checks and attacks while the source is in sight. Can't move closer to it.",
-  Grappled: "Speed is 0.",
-  Incapacitated: "Can't take actions or reactions.",
-  Invisible: "Attacks against it have disadvantage; its attacks have advantage.",
-  Paralyzed:
-    "Incapacitated, can't move or speak. Fails Str and Dex saves. Hits from within 5 ft are crits.",
-  Petrified: "Turned to stone. Incapacitated, resistant to all damage.",
-  Poisoned: "Disadvantage on attack rolls and ability checks.",
-  Prone: "Can only crawl. Disadvantage on attacks. Melee attacks against it have advantage.",
-  Restrained: "Speed 0. Disadvantage on attacks and Dex saves. Attacks against it have advantage.",
-  Stunned:
-    "Incapacitated, can barely speak. Fails Str and Dex saves. Attacks against it have advantage.",
-  Unconscious: "Incapacitated and prone, drops what it holds. Hits from within 5 ft are crits.",
-  Exhaustion: "Six levels. Each level adds a further penalty; level 6 is death.",
-  Concentrating: "When it takes damage, Con save DC 10 or half the damage, whichever is higher.",
-};
+/** Tooltip lines, taken from the glossary so the wording lives in one place. */
+export const CONDITION_RULES: Record<string, string> = Object.fromEntries(
+  CONDITIONS.map((name) => [name, getEntry(conditionEntryId(name))?.short ?? ""]),
+);
 
 /** Copy labels: a single creature keeps its name, groups become "Orc A", "Orc B"… */
 export const unitLabel = (c: Combatant, i: number) =>

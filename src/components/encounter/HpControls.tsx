@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { RefTerm } from "@/components/reference/RefTerm";
 import { cn } from "@/lib/utils";
 
 const HEART =
@@ -12,16 +13,24 @@ export function HpMeter({ hp, max }: { hp: number; max: number }) {
     <div className="grid gap-1.5">
       <div className="flex items-baseline gap-1.5 font-mono text-[13px] text-muted-foreground tabular">
         <b className="text-[17px] font-semibold text-foreground">{hp}</b>/ {max}
-        {state && (
-          <span
-            className={cn(
-              "ml-auto font-sans text-[11px] font-semibold",
-              state === "Bloodied" ? "text-gold-foreground" : "text-destructive",
-            )}
-          >
-            {state}
-          </span>
-        )}
+        {state &&
+          (state === "Down" ? (
+            <RefTerm
+              id="dropping-to-0-hp"
+              className="ml-auto font-sans text-[11px] font-semibold text-destructive"
+            >
+              {state}
+            </RefTerm>
+          ) : (
+            <span
+              className={cn(
+                "ml-auto font-sans text-[11px] font-semibold",
+                state === "Bloodied" ? "text-gold-foreground" : "text-destructive",
+              )}
+            >
+              {state}
+            </span>
+          ))}
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-foreground/10">
         <i

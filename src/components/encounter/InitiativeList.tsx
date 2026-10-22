@@ -22,6 +22,8 @@ import { Button } from "@/components/ui/button";
 import { Tombstone } from "@/components/Tombstone";
 import { useWorkspace } from "@/components/Workspace";
 import { cn } from "@/lib/utils";
+import { RefTerm, RulesHint } from "@/components/reference/RefTerm";
+import { useReference } from "@/components/reference/ReferenceLayer";
 import { ConditionChips } from "./ConditionChips";
 import { DamageHeal, HpMeter } from "./HpControls";
 
@@ -131,6 +133,7 @@ function CombatantRow({
   const { characters, setCharacters } = useWorkspace();
   const live = isLive(encounter);
   const active = live && encounter.turnId === c.id;
+  const { tooltips } = useReference();
   const src = statSource(c);
   const immune = immunities(c);
   const saved = characters.find((person) => person.id === (c.characterId ?? c.npcId)) ?? null;
@@ -162,13 +165,18 @@ function CombatantRow({
       <div className="grid justify-items-center gap-1 pr-2">
         <InitInput c={c} onCommit={(init) => updateC(c.id, (x) => ({ ...x, init }))} />
         {active && (
-          <button
-            onClick={() => update(holdTurn)}
-            title="Hold this turn and act later"
-            className="h-5 rounded-full border border-input bg-card px-2.5 text-[10.5px] font-semibold text-muted-foreground hover:border-primary hover:text-wine-ink"
-          >
-            Hold
-          </button>
+          <RulesHint id="holding-your-action">
+            <button
+              onClick={() => update(holdTurn)}
+              title={tooltips ? undefined : "Hold this turn and act later"}
+              className={cn(
+                "h-5 rounded-full border border-input bg-card px-2.5 text-[10.5px] font-semibold text-muted-foreground hover:border-primary hover:text-wine-ink",
+                tooltips && "underline decoration-dotted underline-offset-2",
+              )}
+            >
+              Hold
+            </button>
+          </RulesHint>
         )}
         {live && c.held && (
           <button
@@ -256,7 +264,7 @@ function CombatantRow({
                   )}
                   {i === 0 && c.held && (
                     <span className="rounded bg-gold/25 px-1.5 py-0.5 font-mono text-[10px] text-gold-foreground">
-                      Holding
+                      <RefTerm id="holding-your-action">Holding</RefTerm>
                     </span>
                   )}
                 </div>

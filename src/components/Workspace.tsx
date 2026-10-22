@@ -4,6 +4,7 @@ import {
   Archive,
   BookOpen,
   Bookmark,
+  Library,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
@@ -23,6 +24,8 @@ import {
 import { DEFAULT_CAMPAIGN_NAME, useCampaignStore } from "@/lib/campaigns";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
+import { ReferenceProvider, useReference } from "@/components/reference/ReferenceLayer";
 import { Textarea } from "@/components/ui/textarea";
 import { applyTheme, readTheme, writeTheme, type ThemeChoice } from "@/lib/theme";
 import { cn } from "@/lib/utils";
@@ -135,252 +138,286 @@ export function Workspace({ children }: { children: ReactNode }) {
 
   return (
     <WorkspaceContext.Provider value={{ ...campaigns, activeId, setActiveId, newEncounter }}>
-      <div className="flex h-dvh min-h-0 w-full overflow-hidden bg-background text-foreground">
-        <aside
-          aria-label="Main navigation"
-          className={cn(
-            "flex h-full min-h-0 shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 motion-reduce:transition-none",
-            open ? "w-64" : "w-14",
-          )}
-        >
-          <div
+      <ReferenceProvider>
+        <div className="flex h-dvh min-h-0 w-full overflow-hidden bg-background text-foreground">
+          <aside
+            aria-label="Main navigation"
             className={cn(
-              "flex items-start border-b border-border py-4",
-              open ? "justify-between gap-1 px-3" : "justify-center",
+              "flex h-full min-h-0 shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 motion-reduce:transition-none",
+              open ? "w-64" : "w-14",
             )}
           >
-            {open && (
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-1 px-1">
-                  <p className="label-caps text-[10px]">Campaign</p>
-                  <div className="flex">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      aria-label="New campaign"
-                      title="New campaign"
-                      onClick={createCampaign}
-                      disabled={!campaigns.ready}
-                    >
-                      <Plus />
-                    </Button>
-                    {campaigns.campaigns.length > 1 && (
+            <div
+              className={cn(
+                "flex items-start border-b border-border py-4",
+                open ? "justify-between gap-1 px-3" : "justify-center",
+              )}
+            >
+              {open && (
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1 px-1">
+                    <p className="label-caps text-[10px]">Campaign</p>
+                    <div className="flex">
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7"
-                        aria-label="Delete campaign"
-                        title="Delete campaign"
-                        onClick={deleteCampaign}
+                        aria-label="New campaign"
+                        title="New campaign"
+                        onClick={createCampaign}
+                        disabled={!campaigns.ready}
                       >
-                        <Trash2 />
+                        <Plus />
                       </Button>
-                    )}
+                      {campaigns.campaigns.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          aria-label="Delete campaign"
+                          title="Delete campaign"
+                          onClick={deleteCampaign}
+                        >
+                          <Trash2 />
+                        </Button>
+                      )}
+                    </div>
                   </div>
+                  <select
+                    aria-label="Campaign"
+                    className="mt-1 h-8 w-full rounded-md border border-input bg-card px-2 text-sm"
+                    value={campaigns.campaignId ?? ""}
+                    disabled={!campaigns.ready}
+                    onChange={(e) => chooseCampaign(e.target.value)}
+                  >
+                    {campaigns.campaigns.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name || "Untitled campaign"}
+                      </option>
+                    ))}
+                  </select>
+                  <Textarea
+                    ref={nameRef}
+                    aria-label="Campaign name"
+                    value={campaigns.campaign?.name ?? ""}
+                    rows={2}
+                    disabled={!campaigns.ready}
+                    onChange={(e) => campaigns.renameCampaign(e.target.value.replace(/\n/g, " "))}
+                    onBlur={() => {
+                      if (campaigns.ready && !campaigns.campaign?.name.trim())
+                        campaigns.renameCampaign(DEFAULT_CAMPAIGN_NAME);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        e.currentTarget.blur();
+                      }
+                    }}
+                    className="mt-1 min-h-0 w-full resize-none border-transparent bg-transparent px-1 py-0.5 font-display text-lg font-semibold leading-6 shadow-none hover:border-input focus-visible:border-primary focus-visible:ring-0 disabled:opacity-100 md:text-lg"
+                  />
                 </div>
-                <select
-                  aria-label="Campaign"
-                  className="mt-1 h-8 w-full rounded-md border border-input bg-card px-2 text-sm"
-                  value={campaigns.campaignId ?? ""}
-                  disabled={!campaigns.ready}
-                  onChange={(e) => chooseCampaign(e.target.value)}
-                >
-                  {campaigns.campaigns.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name || "Untitled campaign"}
-                    </option>
-                  ))}
-                </select>
-                <Textarea
-                  ref={nameRef}
-                  aria-label="Campaign name"
-                  value={campaigns.campaign?.name ?? ""}
-                  rows={2}
-                  disabled={!campaigns.ready}
-                  onChange={(e) => campaigns.renameCampaign(e.target.value.replace(/\n/g, " "))}
-                  onBlur={() => {
-                    if (campaigns.ready && !campaigns.campaign?.name.trim())
-                      campaigns.renameCampaign(DEFAULT_CAMPAIGN_NAME);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      e.currentTarget.blur();
-                    }
-                  }}
-                  className="mt-1 min-h-0 w-full resize-none border-transparent bg-transparent px-1 py-0.5 font-display text-lg font-semibold leading-6 shadow-none hover:border-input focus-visible:border-primary focus-visible:ring-0 disabled:opacity-100 md:text-lg"
-                />
-              </div>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="shrink-0"
-              aria-label={open ? "Hide menu" : "Show menu"}
-              title={open ? "Hide menu" : "Show menu"}
-              onClick={() => setOpen(!open)}
-            >
-              {open ? <PanelLeftClose /> : <PanelLeftOpen />}
-            </Button>
-          </div>
-          {open ? (
-            <nav className="flex-1 overflow-y-auto px-3 py-4">
-              <h2 className="label-caps mb-1.5 px-2.5">Encounters</h2>
-              {campaigns.encounters.length === 0 && (
-                <p className="px-2 text-sm text-muted-foreground">No encounters yet.</p>
               )}
-              <ul className="space-y-1">
-                {campaigns.encounters.map((e) => (
-                  <li key={e.id}>
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className={cn(
-                        navClass,
-                        !isSpells && active?.id === e.id ? activeClass : inactiveClass,
-                        e.archived && "text-muted-foreground",
-                      )}
-                    >
-                      <Link
-                        to="/"
-                        onClick={() => setActiveId(e.id)}
-                        aria-current={!isSpells && active?.id === e.id ? "page" : undefined}
-                      >
-                        <span className="min-w-0 truncate">{e.name}</span>
-                        {e.archived ? (
-                          <Archive className="text-muted-foreground" />
-                        ) : (e.round ?? 0) > 0 ? (
-                          <span
-                            className="font-mono text-[10.5px] text-wine-ink"
-                            title={`Round ${e.round}`}
-                          >
-                            R{e.round}
-                          </span>
-                        ) : null}
-                      </Link>
-                    </Button>
-                  </li>
-                ))}
-              </ul>
               <Button
                 variant="ghost"
-                className="mt-1 w-full justify-start px-2.5 font-normal text-muted-foreground"
-                onClick={newEncounter}
+                size="icon"
+                className="shrink-0"
+                aria-label={open ? "Hide menu" : "Show menu"}
+                title={open ? "Hide menu" : "Show menu"}
+                onClick={() => setOpen(!open)}
               >
-                <Plus /> New encounter
+                {open ? <PanelLeftClose /> : <PanelLeftOpen />}
               </Button>
-              <h2 className="label-caps mb-1.5 mt-6 px-2.5">Spells</h2>
-              <Button
-                asChild
-                variant="ghost"
-                className={cn(navClass, isSpells && !selectedList ? activeClass : inactiveClass)}
-              >
-                <Link
-                  to="/spells"
-                  search={{}}
-                  aria-current={isSpells && !selectedList ? "page" : undefined}
+            </div>
+            {open ? (
+              <nav className="flex-1 overflow-y-auto px-3 py-4">
+                <h2 className="label-caps mb-1.5 px-2.5">Encounters</h2>
+                {campaigns.encounters.length === 0 && (
+                  <p className="px-2 text-sm text-muted-foreground">No encounters yet.</p>
+                )}
+                <ul className="space-y-1">
+                  {campaigns.encounters.map((e) => (
+                    <li key={e.id}>
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className={cn(
+                          navClass,
+                          !isSpells && active?.id === e.id ? activeClass : inactiveClass,
+                          e.archived && "text-muted-foreground",
+                        )}
+                      >
+                        <Link
+                          to="/"
+                          onClick={() => setActiveId(e.id)}
+                          aria-current={!isSpells && active?.id === e.id ? "page" : undefined}
+                        >
+                          <span className="min-w-0 truncate">{e.name}</span>
+                          {e.archived ? (
+                            <Archive className="text-muted-foreground" />
+                          ) : (e.round ?? 0) > 0 ? (
+                            <span
+                              className="font-mono text-[10.5px] text-wine-ink"
+                              title={`Round ${e.round}`}
+                            >
+                              R{e.round}
+                            </span>
+                          ) : null}
+                        </Link>
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  variant="ghost"
+                  className="mt-1 w-full justify-start px-2.5 font-normal text-muted-foreground"
+                  onClick={newEncounter}
                 >
-                  <span className="flex items-center gap-2">
-                    <BookOpen /> Spell Book
-                  </span>
-                </Link>
-              </Button>
-              <ul className="mt-1 space-y-1">
-                {campaigns.lists.map((l) => (
-                  <li key={l.id}>
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className={cn(
-                        navClass,
-                        isSpells && selectedList === l.id ? activeClass : inactiveClass,
-                      )}
-                    >
-                      <Link
-                        to="/spells"
-                        search={{ list: l.id }}
-                        aria-current={isSpells && selectedList === l.id ? "page" : undefined}
+                  <Plus /> New encounter
+                </Button>
+                <h2 className="label-caps mb-1.5 mt-6 px-2.5">Spells</h2>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className={cn(navClass, isSpells && !selectedList ? activeClass : inactiveClass)}
+                >
+                  <Link
+                    to="/spells"
+                    search={{}}
+                    aria-current={isSpells && !selectedList ? "page" : undefined}
+                  >
+                    <span className="flex items-center gap-2">
+                      <BookOpen /> Spell Book
+                    </span>
+                  </Link>
+                </Button>
+                <ul className="mt-1 space-y-1">
+                  {campaigns.lists.map((l) => (
+                    <li key={l.id}>
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className={cn(
+                          navClass,
+                          isSpells && selectedList === l.id ? activeClass : inactiveClass,
+                        )}
                       >
-                        <span className="flex min-w-0 items-center gap-2">
-                          <Bookmark />
-                          <span className="truncate">{l.name}</span>
-                        </span>
-                        <span className="font-mono text-[11px] text-muted-foreground">
-                          {l.spellIds.length}
-                        </span>
-                      </Link>
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-              <Button
-                variant="ghost"
-                className="mt-1 w-full justify-start px-2.5 font-normal text-muted-foreground"
-                onClick={newFavorite}
-              >
-                <Plus /> New list
-              </Button>
-              <CharacterNav
-                title="Party"
-                people={campaigns.characters.filter((c) => c.role === "pc")}
-                selectedId={isParty ? selectedCharacter : undefined}
-                activeClass={activeClass}
-                inactiveClass={inactiveClass}
-                navClass={navClass}
-                onOpen={(id) => void navigate({ to: "/party", search: { id } })}
-                onAdd={() => addCharacter("pc")}
-                addLabel="New character"
+                        <Link
+                          to="/spells"
+                          search={{ list: l.id }}
+                          aria-current={isSpells && selectedList === l.id ? "page" : undefined}
+                        >
+                          <span className="flex min-w-0 items-center gap-2">
+                            <Bookmark />
+                            <span className="truncate">{l.name}</span>
+                          </span>
+                          <span className="font-mono text-[11px] text-muted-foreground">
+                            {l.spellIds.length}
+                          </span>
+                        </Link>
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  variant="ghost"
+                  className="mt-1 w-full justify-start px-2.5 font-normal text-muted-foreground"
+                  onClick={newFavorite}
+                >
+                  <Plus /> New list
+                </Button>
+                <CharacterNav
+                  title="Party"
+                  people={campaigns.characters.filter((c) => c.role === "pc")}
+                  selectedId={isParty ? selectedCharacter : undefined}
+                  activeClass={activeClass}
+                  inactiveClass={inactiveClass}
+                  navClass={navClass}
+                  onOpen={(id) => void navigate({ to: "/party", search: { id } })}
+                  onAdd={() => addCharacter("pc")}
+                  addLabel="New character"
+                />
+                <CharacterNav
+                  title="NPCs"
+                  people={campaigns.characters.filter((c) => c.role === "npc")}
+                  selectedId={isParty ? selectedCharacter : undefined}
+                  activeClass={activeClass}
+                  inactiveClass={inactiveClass}
+                  navClass={navClass}
+                  onOpen={(id) => void navigate({ to: "/party", search: { id } })}
+                  onAdd={() => addCharacter("npc")}
+                  addLabel="New NPC"
+                />
+              </nav>
+            ) : (
+              <nav className="flex min-h-0 flex-1 flex-col items-center gap-2 overflow-y-auto py-3">
+                <Button asChild variant="ghost" size="icon" title="Encounters">
+                  <Link to="/" aria-label="Encounters">
+                    <Swords />
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" size="icon" title="Spell Book">
+                  <Link to="/spells" search={{}} aria-label="Spell Book">
+                    <BookOpen />
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" size="icon" title="Party">
+                  <Link to="/party" search={{}} aria-label="Party">
+                    <Users />
+                  </Link>
+                </Button>
+              </nav>
+            )}
+            <div
+              className={cn(
+                "mt-auto border-t border-border p-2",
+                !open && "flex flex-col items-center gap-1",
+              )}
+            >
+              <ReferenceButton open={open} />
+              <ThemeSettings
+                open={open}
+                theme={theme}
+                onChange={(choice) => {
+                  setTheme(choice);
+                  writeTheme(choice);
+                }}
               />
-              <CharacterNav
-                title="NPCs"
-                people={campaigns.characters.filter((c) => c.role === "npc")}
-                selectedId={isParty ? selectedCharacter : undefined}
-                activeClass={activeClass}
-                inactiveClass={inactiveClass}
-                navClass={navClass}
-                onOpen={(id) => void navigate({ to: "/party", search: { id } })}
-                onAdd={() => addCharacter("npc")}
-                addLabel="New NPC"
-              />
-            </nav>
-          ) : (
-            <nav className="flex min-h-0 flex-1 flex-col items-center gap-2 overflow-y-auto py-3">
-              <Button asChild variant="ghost" size="icon" title="Encounters">
-                <Link to="/" aria-label="Encounters">
-                  <Swords />
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" size="icon" title="Spell Book">
-                <Link to="/spells" search={{}} aria-label="Spell Book">
-                  <BookOpen />
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" size="icon" title="Party">
-                <Link to="/party" search={{}} aria-label="Party">
-                  <Users />
-                </Link>
-              </Button>
-            </nav>
-          )}
-          <ThemeSettings
-            open={open}
-            theme={theme}
-            onChange={(choice) => {
-              setTheme(choice);
-              writeTheme(choice);
-            }}
-          />
-        </aside>
-        <div
-          key={campaigns.campaignId ?? "pending"}
-          className="flex min-h-0 min-w-0 flex-1 overflow-hidden"
-        >
-          {children}
+            </div>
+          </aside>
+          <div
+            key={campaigns.campaignId ?? "pending"}
+            className="flex min-h-0 min-w-0 flex-1 overflow-hidden"
+          >
+            {children}
+          </div>
         </div>
-      </div>
-      <Toaster position="bottom-right" />
+        <Toaster position="bottom-right" />
+      </ReferenceProvider>
     </WorkspaceContext.Provider>
+  );
+}
+
+function ReferenceButton({ open }: { open: boolean }) {
+  const { toggle, open: drawerOpen } = useReference();
+  return (
+    <Button
+      variant="ghost"
+      size={open ? "default" : "icon"}
+      aria-label="Reference"
+      aria-expanded={drawerOpen}
+      title="Reference (⌘/)"
+      data-reference-trigger
+      onClick={toggle}
+      className={cn(open && "mb-1 w-full justify-start px-2.5 font-normal")}
+    >
+      <Library />
+      {open && (
+        <>
+          <span className="flex-1 text-left">Reference</span>
+          <kbd className="font-mono text-[10px] text-muted-foreground">⌘/</kbd>
+        </>
+      )}
+    </Button>
   );
 }
 
@@ -399,8 +436,9 @@ function ThemeSettings({
   theme: ThemeChoice;
   onChange: (choice: ThemeChoice) => void;
 }) {
+  const { tooltips, setTooltips } = useReference();
   return (
-    <div className={cn("border-t border-border p-2", open ? "" : "flex justify-center")}>
+    <div className={cn(open ? "" : "flex justify-center")}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -432,6 +470,19 @@ function ThemeSettings({
                 {choice.label}
               </button>
             ))}
+          </div>
+          <div className="my-2 border-t border-border" />
+          <div
+            className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-md px-2.5 py-1.5 text-left text-sm hover:bg-accent"
+            onClick={() => setTooltips(!tooltips)}
+          >
+            <span id="rules-tooltips-label">Rules tooltips</span>
+            <Switch
+              checked={tooltips}
+              aria-labelledby="rules-tooltips-label"
+              onClick={(event) => event.stopPropagation()}
+              onCheckedChange={setTooltips}
+            />
           </div>
         </PopoverContent>
       </Popover>
