@@ -1,4 +1,13 @@
 import { makeCharacter, type CharacterRole } from "@/lib/characters";
+import {
+  encounterParent,
+  ensureFolderPath,
+  findFolderByPath,
+  folderPath,
+  nextSort,
+  splitPath,
+  type EncounterFolder,
+} from "@/lib/folders";
 import type { SpellList } from "@/lib/spells";
 import { makeUnits, uid, type Combatant, type Encounter, type LootItem } from "@/lib/encounters";
 import {
@@ -22,7 +31,7 @@ import type {
 
 export type Ctx = { library: LibraryMonster[]; magic: MagicItem[]; spells: SrdSpell[] };
 export type PlanItem = {
-  kind: "encounter" | "npc" | "group";
+  kind: "encounter" | "npc" | "group" | "folder";
   action: "create" | "reuse" | "update" | "skip";
   name: string;
   detail?: string | undefined;
@@ -35,6 +44,7 @@ export type Uncertain = {
 };
 export type Plan = {
   encounters: Encounter[];
+  folders: EncounterFolder[];
   characters: Character[];
   spellLists: SpellList[];
   items: PlanItem[];
@@ -378,6 +388,7 @@ export function upsertNpc(
 
 export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Plan {
   const encounters = structuredClone(campaign.encounters);
+  let folders = structuredClone(campaign.folders);
   const characters = structuredClone(campaign.characters);
   const items: PlanItem[] = [];
   const gaps: string[] = [];
@@ -398,14 +409,38 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
   }
 
   for (const e of bundle.encounters) {
+    const path = e.folder === undefined ? null : splitPath(e.folder);
+    // With a folder named, only that folder's encounters can be the same one. A same-named
+    // encounter in another folder is a different branch of the story.
+    const scope = path
+      ? (() => {
+          const found = findFolderByPath(folders, path);
+          return found ? encounters.filter((x) => encounterParent(folders, x) === found.id) : [];
+        })()
+      : encounters;
     const sameKey = (x: Encounter) =>
       !!e.location &&
       x.session === bundle.session &&
       !!x.location &&
       matchScore(e.location, x.location) === 3;
-    let hit = encounters.find((x) => isExact(e.name, x)) ?? encounters.find(sameKey);
+    const exact = scope.filter((x) => isExact(e.name, x));
+    if (exact.length > 1) {
+      uncertain.push({
+        kind: "encounter",
+        proposed: e.name,
+        existing: exact
+          .map(
+            (x) =>
+              `${folderPath(folders, encounterParent(folders, x)) || "top level"} (id ${x.id})`,
+          )
+          .join("; "),
+        question: `"${e.name}" exists in several folders. Say which one by sending its folder path.`,
+      });
+      continue;
+    }
+    let hit = exact[0] ?? scope.find(sameKey);
     if (!hit && !e.distinct) {
-      const similar = encounters.find((x) => isSimilar(e.name, x));
+      const similar = scope.find((x) => isSimilar(e.name, x));
       if (similar) {
         uncertain.push({
           kind: "encounter",
@@ -417,6 +452,20 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
       }
     }
     const isNew = !hit;
+    let folderId: string | null = null;
+    if (path) {
+      const before = folders.length;
+      try {
+        const made = ensureFolderPath({ folders, encounters }, path, uid);
+        folders = made.state.folders;
+        folderId = made.id;
+      } catch (error) {
+        gaps.push(`${e.name}: ${error instanceof Error ? error.message : String(error)}`);
+        continue;
+      }
+      for (const f of folders.slice(before))
+        items.push({ kind: "folder", action: "create", name: folderPath(folders, f.id) });
+    }
     const enc: Encounter = hit ?? {
       id: uid(),
       name: e.name,
@@ -425,6 +474,8 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
       combatants: [],
       session: bundle.session,
       status: e.status ?? "staged",
+      ...(folderId ? { folderId } : {}),
+      sort: nextSort({ folders, encounters }, folderId),
     };
     if (isNew) encounters.push(enc);
 
@@ -504,7 +555,13 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
           ? "update"
           : "reuse",
       name: enc.name + dormant,
-      detail: bits.join(", ") || "already in the tracker",
+      detail:
+        [
+          path?.length ? `in ${path.join(" / ")}` : "",
+          bits.join(", ") || (isNew ? "" : "already in the tracker"),
+        ]
+          .filter(Boolean)
+          .join("; ") || undefined,
     });
   }
 
@@ -512,6 +569,7 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
     items.filter((i) => i.kind === kind && i.action === action).length;
   const dormantNew = bundle.encounters.filter((e) => e.status === "dormant").length;
   const headline = [
+    count("folder", "create") ? `Folders: ${count("folder", "create")} new.` : "",
     `Encounters: ${count("encounter", "create")} new, ${count("encounter", "update")} updated, ${count("encounter", "reuse")} already there${dormantNew ? ` (${dormantNew} dormant in this import)` : ""}.`,
     `${count("group", "create")} creature groups${customMonsters ? `, ${customMonsters} with custom stat blocks` : ""}.`,
     `NPCs: ${count("npc", "create")} new, ${count("npc", "update") + count("npc", "reuse")} reused.`,
@@ -524,5 +582,5 @@ export function planImport(campaign: CampaignView, bundle: Bundle, ctx: Ctx): Pl
     .filter(Boolean)
     .join(" ");
 
-  return { encounters, characters, spellLists, items, gaps, uncertain, headline };
+  return { encounters, folders, characters, spellLists, items, gaps, uncertain, headline };
 }

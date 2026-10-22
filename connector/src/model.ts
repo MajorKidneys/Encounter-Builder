@@ -1,6 +1,7 @@
 import { coerceCharacter, type Character } from "@/lib/characters";
 import type { SpellList } from "@/lib/spells";
 import type { Combatant, Encounter, LootItem } from "@/lib/encounters";
+import type { EncounterFolder } from "@/lib/folders";
 import type { Keys } from "./dataFile.js";
 
 export type { Character, Combatant, Encounter, LootItem };
@@ -14,8 +15,10 @@ export type CampaignView = {
   characters: Character[];
   /** Named spell lists shown on the Spell Book page. */
   spellLists: SpellList[];
+  /** Folders the encounters are grouped into. */
+  folders: EncounterFolder[];
   /** The storage keys this campaign's data lives under, or null on the original single-campaign layout. */
-  keys: { encounters: string; characters: string; spellLists: string } | null;
+  keys: { encounters: string; characters: string; spellLists: string; folders: string } | null;
 };
 
 const asArray = <T>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
@@ -39,10 +42,19 @@ export function loadCampaigns(keys: Keys): CampaignView[] {
       encounters: asArray<Encounter>(keys[`dm-c-${c.id}-encounters`]),
       characters: asCharacters(keys[`dm-c-${c.id}-characters`]),
       spellLists: asArray<SpellList>(keys[`dm-c-${c.id}-spell-lists`]),
+      folders: asArray<EncounterFolder>(keys[`dm-c-${c.id}-folders`]).filter(
+        (f) =>
+          f &&
+          typeof f.id === "string" &&
+          typeof f.name === "string" &&
+          typeof f.sort === "number" &&
+          (typeof f.parentId === "string" || f.parentId === null),
+      ),
       keys: {
         encounters: `dm-c-${c.id}-encounters`,
         characters: `dm-c-${c.id}-characters`,
         spellLists: `dm-c-${c.id}-spell-lists`,
+        folders: `dm-c-${c.id}-folders`,
       },
     }));
   }
@@ -55,6 +67,7 @@ export function loadCampaigns(keys: Keys): CampaignView[] {
       encounters: asArray<Encounter>(keys["dm-encounters-v1"]),
       characters: [],
       spellLists: [],
+      folders: [],
       keys: null,
     },
   ];

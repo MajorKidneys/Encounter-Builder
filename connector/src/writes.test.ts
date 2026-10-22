@@ -516,3 +516,157 @@ describe("small edits", () => {
     ]);
   });
 });
+
+describe("setting, prep notes and folders", () => {
+  let call: Awaited<ReturnType<typeof connect>>;
+  const folders = (): J[] => keys()["dm-c-c1-folders"] ?? [];
+  const named = (name: string) => encounters().filter((e) => e.name === name);
+  const feast = (folder?: string, extra: J = {}) => ({
+    session: "S3",
+    encounters: [
+      {
+        name: "The Feast",
+        setting: "A long table under paper lanterns.",
+        tactics: "They never strike first.",
+        ...(folder ? { folder } : {}),
+        ...extra,
+      },
+    ],
+  });
+  const save = async (b: J) => {
+    const p = await call("import_session", b);
+    expect(p.isError).toBe(false);
+    return call("import_session", { ...b, confirm: true, planId: p.json.planId });
+  };
+
+  beforeEach(async () => {
+    dir = mkdtempSync(path.join(tmpdir(), "folders-"));
+    seed();
+    call = await connect();
+  });
+
+  it("creates the folder path on import, and says so in the preview", async () => {
+    const b = feast("If they join the band / Sent on the raid");
+    const preview = await call("import_session", b);
+    expect(preview.json.items.filter((i: J) => i.kind === "folder").map((i: J) => i.name)).toEqual([
+      "If they join the band",
+      "If they join the band / Sent on the raid",
+    ]);
+    expect(folders()).toEqual([]);
+    await save(b);
+    expect(folders().map((f) => [f.name, f.parentId === null])).toEqual([
+      ["If they join the band", true],
+      ["Sent on the raid", false],
+    ]);
+    const e = named("The Feast")[0]!;
+    expect(e.folderId).toBe(folders()[1]!.id);
+    expect(e.setting).toBe("A long table under paper lanterns.");
+    expect(e.tactics).toBe("They never strike first.");
+    expect(typeof e.sort).toBe("number");
+  });
+
+  it("reuses folders case-insensitively and keeps the same name in different folders apart", async () => {
+    await save(feast("Night 1"));
+    await save(feast("night 1", { tactics: "ignored on reuse" }));
+    expect(folders()).toHaveLength(1);
+    expect(named("The Feast")).toHaveLength(1);
+    await save(feast("Night 2"));
+    expect(named("The Feast")).toHaveLength(2);
+    expect(folders()).toHaveLength(2);
+  });
+
+  it("refuses a path deeper than three levels without saving that encounter", async () => {
+    const parsed = await call("import_session", feast("a / b / c / d"));
+    expect(parsed.isError).toBe(true);
+    expect(parsed.text).toMatch(/3 levels/);
+  });
+
+  it("rejects a location that is really a paragraph, in an import and in an edit", async () => {
+    const long = "x".repeat(61);
+    expect((await call("import_session", feast(undefined, { location: long }))).isError).toBe(true);
+    await save(feast());
+    const r = await call("update_encounter", { encounter: "The Feast", location: long });
+    expect(r.isError).toBe(true);
+  });
+
+  it("update_encounter sets and clears every prep field and edits room loot", async () => {
+    await save(feast(undefined, { loot: [{ name: "Apples", quantity: 2 }] }));
+    const r = await call("update_encounter", {
+      encounter: "The Feast",
+      session: "S4",
+      location: "G1",
+      morale: "Flees at half.",
+      trigger: "If the chalice moves",
+      status: "dormant",
+      tactics: null,
+      setting: "",
+      roomLoot: [{ name: "Apples", condition: "Dewey's, once picked" }, { name: "Wine" }],
+    });
+    expect(r.isError).toBe(false);
+    const e = enc("The Feast");
+    expect(e).toMatchObject({
+      session: "S4",
+      location: "G1",
+      morale: "Flees at half.",
+      status: "dormant",
+    });
+    expect("tactics" in e).toBe(false);
+    expect("setting" in e).toBe(false);
+    expect(e.roomLoot.map((l: J) => l.name)).toEqual(["Apples ×2", "Wine"]);
+    expect(e.roomLoot[0].condition).toBe("Dewey's, once picked");
+    await call("update_encounter", { encounter: "The Feast", roomLoot: [] });
+    expect("roomLoot" in enc("The Feast")).toBe(false);
+  });
+
+  it("moves an encounter between folders and out to the top level", async () => {
+    await save(feast());
+    await call("update_encounter", { encounter: "The Feast", folder: "Night 1 / River Fort" });
+    expect(enc("The Feast").folderId).toBe(folders()[1]!.id);
+    await call("update_encounter", { encounter: "The Feast", folder: null });
+    expect(enc("The Feast").folderId).toBeNull();
+  });
+
+  it("picks between same-named encounters by id or by path, and lists them in the error", async () => {
+    await save(feast("Night 1"));
+    await save(feast("Night 2"));
+    const bare = await call("update_encounter", { encounter: "The Feast", morale: "x" });
+    expect(bare.isError).toBe(true);
+    expect(bare.text).toMatch(/Night 1 \/ The Feast \(id /);
+    expect(bare.text).toMatch(/Night 2 \/ The Feast \(id /);
+    const viaPath = await call("update_encounter", {
+      encounter: "Night 2 / The Feast",
+      morale: "Path",
+    });
+    expect(viaPath.isError).toBe(false);
+    const night2 = folders().find((f) => f.name === "Night 2")!.id;
+    expect(encounters().find((e) => e.folderId === night2)!.morale).toBe("Path");
+    const first = encounters().find((e) => e.morale !== "Path")!;
+    const viaId = await call("update_encounter", { encounter: first.id, morale: "Id" });
+    expect(viaId.isError).toBe(false);
+    expect(encounters().find((e) => e.id === first.id)!.morale).toBe("Id");
+  });
+
+  it("find_encounter returns the prep fields and list_encounters lays out the tree", async () => {
+    await save(feast("Night 1 / River Fort", { location: "G1", loot: [{ name: "Apples" }] }));
+    await save({ session: "S3", encounters: [{ name: "Road Herd" }] });
+    const found = (await call("find_encounter", { name: "feast" })).json.matches[0];
+    expect(found).toMatchObject({
+      folder: "Night 1 / River Fort",
+      session: "S3",
+      location: "G1",
+      tactics: "They never strike first.",
+      setting: "A long table under paper lanterns.",
+    });
+    expect(found.roomLoot[0]).toMatchObject({ name: "Apples", taken: false });
+    const tree = (await call("list_encounters")).json;
+    expect(tree.totalFolders).toBe(2);
+    const night = tree.outline.find((n: J) => n.folder === "Night 1");
+    expect(night.items[0].folder).toBe("River Fort");
+    expect(night.items[0].items[0]).toMatchObject({
+      encounter: "The Feast",
+      location: "G1",
+      hasSetting: true,
+    });
+    expect(tree.outline.some((n: J) => n.encounter === "Road Herd")).toBe(true);
+  });
+});
