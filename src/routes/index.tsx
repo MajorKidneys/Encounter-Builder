@@ -25,6 +25,7 @@ import { AddCombatant } from "@/components/encounter/AddCombatant";
 import { PrepNotes } from "@/components/encounter/PrepNotes";
 import { CreatureDrawer } from "@/components/encounter/CreatureDrawer";
 import { Stage } from "@/components/Stage";
+import { RefTerm } from "@/components/reference/RefTerm";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -63,6 +64,7 @@ function Index() {
       // belong to the lightbox, never to the page behind it.
       if (t.closest("[role=dialog]") || t.closest("[data-radix-popper-content-wrapper]")) return;
       if (t.closest("[data-drawer-panel]") || t.closest("[data-drawer-trigger]")) return;
+      if (t.closest("[data-reference-drawer]")) return;
       setDrawerId(null);
     };
     document.addEventListener("mousedown", onDown);
@@ -76,6 +78,18 @@ function Index() {
     update((e) => ({ ...e, combatants: e.combatants.map((c) => (c.id === cid ? fn(c) : c)) }));
   const drawer = active?.combatants.find((c) => c.id === drawerId) ?? null;
   const live = active ? isLive(active) : false;
+
+  // Esc closes this panel only after popovers and the reference drawer.
+  useEffect(() => {
+    if (!drawerId) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (document.querySelector("[role=dialog][data-state=open], [data-reference-drawer]")) return;
+      setDrawerId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [drawerId]);
 
   // Space advances the turn when focus isn't in a field.
   useEffect(() => {
@@ -207,7 +221,9 @@ function Index() {
                   <ChevronLeft />
                 </Button>
                 <div className="grid justify-items-center px-3 leading-none">
-                  <span className="label-caps text-[9.5px]">Round</span>
+                  <RefTerm id="combat-flow" className="label-caps text-[9.5px]">
+                    Round
+                  </RefTerm>
                   <b className="font-mono text-lg font-semibold tabular">{active.round}</b>
                 </div>
                 <Button onClick={() => update(nextTurn)}>

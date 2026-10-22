@@ -2,6 +2,9 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { type Condition, uid } from "@/lib/encounters";
 import { CONDITIONS, CONDITION_RULES } from "@/lib/turns";
+import { conditionEntryId } from "@/lib/reference";
+import { RefTerm, RulesHint } from "@/components/reference/RefTerm";
+import { useReference } from "@/components/reference/ReferenceLayer";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +25,7 @@ export function ConditionChips({
   immune?: string[];
   onChange: (next: Condition[]) => void;
 }) {
+  const { tooltips } = useReference();
   const remove = (id: string) => onChange(conditions.filter((k) => k.id !== id));
   return (
     <div className="flex flex-wrap items-center gap-1.5">
@@ -31,7 +35,7 @@ export function ConditionChips({
           return (
             <span
               key={k.id}
-              title={tip}
+              title={tooltips ? undefined : tip}
               className={cn(chip, "border-dashed border-primary pr-0.5 text-wine-ink")}
             >
               {k.name} ended
@@ -61,7 +65,7 @@ export function ConditionChips({
         return (
           <span
             key={k.id}
-            title={exh ? `${tip} Click the dots to change the level.` : tip}
+            title={tooltips ? undefined : exh ? `${tip} Click the dots to change the level.` : tip}
             className={cn(
               chip,
               conc
@@ -69,7 +73,7 @@ export function ConditionChips({
                 : "bg-secondary text-secondary-foreground",
             )}
           >
-            {k.name}
+            <RefTerm id={conditionEntryId(k.name)}>{k.name}</RefTerm>
             {k.note && <span className="font-mono text-[10.5px] opacity-80">· {k.note}</span>}
             {exh && (
               <button
@@ -123,6 +127,7 @@ function ConditionPicker({
   immune: string[];
   onChange: (next: Condition[]) => void;
 }) {
+  const { tooltips } = useReference();
   const [rounds, setRounds] = useState("");
   const [note, setNote] = useState("");
   const has = new Set(conditions.map((k) => k.name));
@@ -151,12 +156,12 @@ function ConditionPicker({
         <div className="flex flex-wrap gap-1.5">
           {CONDITIONS.map((n) => {
             const isImmune = immune.includes(n);
-            return (
+            const button = (
               <button
                 key={n}
                 disabled={isImmune}
                 aria-pressed={has.has(n)}
-                title={isImmune ? `${name} is immune` : CONDITION_RULES[n]}
+                title={isImmune ? `${name} is immune` : tooltips ? undefined : CONDITION_RULES[n]}
                 onClick={() => toggle(n)}
                 className={cn(
                   "h-7 rounded-full border px-3 text-xs",
@@ -165,10 +170,18 @@ function ConditionPicker({
                     : "border-input bg-card hover:border-primary",
                   n === "Concentrating" && !has.has(n) && "border-gold/70",
                   isImmune && "cursor-not-allowed line-through opacity-45",
+                  tooltips && !isImmune && "underline decoration-dotted underline-offset-2",
                 )}
               >
                 {n}
               </button>
+            );
+            return isImmune ? (
+              button
+            ) : (
+              <RulesHint key={n} id={conditionEntryId(n)}>
+                {button}
+              </RulesHint>
             );
           })}
         </div>

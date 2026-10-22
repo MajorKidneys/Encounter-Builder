@@ -6,6 +6,8 @@ import { uid } from "@/lib/encounters";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useWorkspace } from "@/components/Workspace";
+import { RefTerm } from "@/components/reference/RefTerm";
+import { useReference } from "@/components/reference/ReferenceLayer";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/spells")({
@@ -264,14 +266,22 @@ function SpellsPage() {
   );
 }
 
-const ConcMark = () => (
-  <span
-    title="Concentration"
-    className="grid h-[18px] w-[18px] place-items-center rounded-full bg-gold/25 font-mono text-[10px] font-semibold text-gold-foreground"
-  >
-    C
-  </span>
-);
+function ConcMark() {
+  const { tooltips } = useReference();
+  const className =
+    "grid h-[18px] w-[18px] place-items-center rounded-full bg-gold/25 font-mono text-[10px] font-semibold text-gold-foreground";
+  if (!tooltips)
+    return (
+      <span title="Concentration" className={className}>
+        C
+      </span>
+    );
+  return (
+    <RefTerm id="concentration" className={cn(className, "no-underline")}>
+      C
+    </RefTerm>
+  );
+}
 
 function BookRow({
   s,

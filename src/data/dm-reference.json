@@ -1,0 +1,1086 @@
+[
+  {
+    "edition": "2014",
+    "source": "Written for this app",
+    "id": "when-in-doubt",
+    "term": "When in Doubt",
+    "category": "start",
+    "short": "If failure would be interesting, call for a check. Otherwise, it just happens.",
+    "body": "If the outcome is uncertain and failure is interesting, call for a check. Otherwise it just happens.\n\nMake situational modifiers advantage or disadvantage rather than changing the DC. Make a call, keep play moving, and look the rule up after the session.",
+    "related": [
+      "typical-dcs",
+      "advantage"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "typical-dcs-brief",
+    "term": "Typical DCs",
+    "category": "start",
+    "short": "5 very easy, 10 easy, 15 medium, 20 hard, 25 very hard, 30 nearly impossible.",
+    "body": "Pick the DC by how hard the task would be for a competent, ordinary person. The full table is under Rulings.",
+    "related": [
+      "typical-dcs"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "combat-flow-brief",
+    "term": "Combat Flow",
+    "category": "start",
+    "short": "Determine surprise, place combatants, roll initiative, then take turns until the fight ends.",
+    "body": "1. Determine surprise.\n2. Place the combatants.\n3. Roll initiative.\n4. Take turns in order.\n5. Repeat until the fight ends.",
+    "related": [
+      "combat-flow"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "your-turn-brief",
+    "term": "Your Turn",
+    "category": "start",
+    "short": "Move, one action, a bonus action only if something grants it, and one free object interaction.",
+    "body": "On a turn: move up to your speed, take one action, take a bonus action only if a feature grants one, and interact with one object for free. One reaction per round.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "skills-brief",
+    "term": "Skills by Ability",
+    "category": "start",
+    "short": "Strength has Athletics. Dexterity has Acrobatics, Sleight of Hand, and Stealth.",
+    "body": "**Strength:** Athletics\n\n**Dexterity:** Acrobatics, Sleight of Hand, Stealth\n\n**Constitution:** none\n\n**Intelligence:** Arcana, History, Investigation, Nature, Religion\n\n**Wisdom:** Animal Handling, Insight, Medicine, Perception, Survival\n\n**Charisma:** Deception, Intimidation, Performance, Persuasion",
+    "related": [
+      "skills"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "advantage-brief",
+    "term": "Advantage & Disadvantage",
+    "category": "start",
+    "short": "Roll a second d20. Advantage uses the higher die, disadvantage the lower. They don't stack.",
+    "body": "Roll a second d20. Use the higher result for advantage and the lower result for disadvantage. Extra dice don't stack, and advantage cancels disadvantage.",
+    "related": [
+      "advantage"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "blinded",
+    "term": "Blinded",
+    "category": "conditions",
+    "short": "Can't see. Attacks against it have advantage; its attacks have disadvantage.",
+    "body": "- A blinded creature can't see and automatically fails any ability check that requires sight.\n- Attack rolls against the creature have advantage, and the creature's attack rolls have disadvantage."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "charmed",
+    "term": "Charmed",
+    "category": "conditions",
+    "short": "Can't attack the charmer. The charmer has advantage on social checks against it.",
+    "body": "- A charmed creature can't attack the charmer or target the charmer with harmful abilities or magical effects.\n- The charmer has advantage on any ability check to interact socially with the creature."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "deafened",
+    "term": "Deafened",
+    "category": "conditions",
+    "short": "Can't hear. Fails checks that rely on hearing.",
+    "body": "- A deafened creature can't hear and automatically fails any ability check that requires hearing."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "exhaustion",
+    "term": "Exhaustion",
+    "category": "conditions",
+    "short": "Six levels. Each level adds a further penalty; level 6 is death.",
+    "body": "Some special abilities and environmental hazards, such as starvation and the long-term effects of freezing or scorching temperatures, can lead to a special condition called exhaustion. Exhaustion is measured in six levels. An effect can give a creature one or more levels of exhaustion, as specified in the effect's description.\n\nIf an already exhausted creature suffers another effect that causes exhaustion, its current level of exhaustion increases by the amount specified in the effect's description.\n\nA creature suffers the effect of its current level of exhaustion as well as all lower levels. For example, a creature suffering level 2 exhaustion has its speed halved and has disadvantage on ability checks.\n\nAn effect that removes exhaustion reduces its level as specified in the effect's description, with all exhaustion effects ending if a creature's exhaustion level is reduced below 1.\n\nFinishing a long rest reduces a creature's exhaustion level by 1, provided that the creature has also ingested some food and drink.",
+    "changedIn2024": "Each level is a −2 penalty on attacks, checks, and saves, and −5 feet of speed, instead of the effects below.",
+    "table": {
+      "columns": [
+        "Level",
+        "Effect"
+      ],
+      "rows": [
+        [
+          "1",
+          "Disadvantage on ability checks"
+        ],
+        [
+          "2",
+          "Speed halved"
+        ],
+        [
+          "3",
+          "Disadvantage on attack rolls and saving throws"
+        ],
+        [
+          "4",
+          "Hit point maximum halved"
+        ],
+        [
+          "5",
+          "Speed reduced to 0"
+        ],
+        [
+          "6",
+          "Death"
+        ]
+      ]
+    },
+    "related": [
+      "food-and-water",
+      "resting"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "frightened",
+    "term": "Frightened",
+    "category": "conditions",
+    "short": "Disadvantage on checks and attacks while the source is in sight. Can't move closer to it.",
+    "body": "- A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight.\n- The creature can't willingly move closer to the source of its fear."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "grappled",
+    "term": "Grappled",
+    "category": "conditions",
+    "short": "Speed is 0.",
+    "body": "- A grappled creature's speed becomes 0, and it can't benefit from any bonus to its speed.\n- The condition ends if the grappler is incapacitated (see the condition).\n- The condition also ends if an effect removes the grappled creature from the reach of the grappler or grappling effect, such as when a creature is hurled away by the thunderwave spell.",
+    "changedIn2024": "A grappled creature also has disadvantage on attack rolls against anyone other than the grappler.",
+    "aliases": [
+      "grab"
+    ],
+    "related": [
+      "grappling-and-shoving",
+      "restrained"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "incapacitated",
+    "term": "Incapacitated",
+    "category": "conditions",
+    "short": "Can't take actions or reactions.",
+    "body": "- An incapacitated creature can't take actions or reactions.",
+    "changedIn2024": "You also cannot take a bonus action or speak, and your concentration ends."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "invisible",
+    "term": "Invisible",
+    "category": "conditions",
+    "short": "Attacks against it have disadvantage; its attacks have advantage.",
+    "body": "- An invisible creature is impossible to see without the aid of magic or a special sense. For the purpose of hiding, the creature is heavily obscured. The creature's location can be detected by any noise it makes or any tracks it leaves.\n- Attack rolls against the creature have disadvantage, and the creature's attack rolls have advantage.",
+    "changedIn2024": "You also have advantage on initiative if you are invisible when you roll it, and effects that must see you cannot target you."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "paralyzed",
+    "term": "Paralyzed",
+    "category": "conditions",
+    "short": "Incapacitated, can't move or speak. Fails Str and Dex saves. Hits from within 5 ft are crits.",
+    "body": "- A paralyzed creature is incapacitated (see the condition) and can't move or speak.\n- The creature automatically fails Strength and Dexterity saving throws.\n- Attack rolls against the creature have advantage.\n- Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "petrified",
+    "term": "Petrified",
+    "category": "conditions",
+    "short": "Turned to stone. Incapacitated, resistant to all damage.",
+    "body": "- A petrified creature is transformed, along with any nonmagical object it is wearing or carrying, into a solid inanimate substance (usually stone). Its weight increases by a factor of ten, and it ceases aging.\n- The creature is incapacitated (see the condition), can't move or speak, and is unaware of its surroundings.\n- Attack rolls against the creature have advantage.\n- The creature automatically fails Strength and Dexterity saving throws.\n- The creature has resistance to all damage.\n- The creature is immune to poison and disease, although a poison or disease already in its system is suspended, not neutralized."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "poisoned",
+    "term": "Poisoned",
+    "category": "conditions",
+    "short": "Disadvantage on attack rolls and ability checks.",
+    "body": "- A poisoned creature has disadvantage on attack rolls and ability checks."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "prone",
+    "term": "Prone",
+    "category": "conditions",
+    "short": "Can only crawl. Disadvantage on attacks. Melee attacks against it have advantage.",
+    "body": "- A prone creature's only movement option is to crawl, unless it stands up and thereby ends the condition.\n- The creature has disadvantage on attack rolls.\n- An attack roll against the creature has advantage if the attacker is within 5 feet of the creature. Otherwise, the attack roll has disadvantage.",
+    "related": [
+      "movement",
+      "falling"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "restrained",
+    "term": "Restrained",
+    "category": "conditions",
+    "short": "Speed 0. Disadvantage on attacks and Dex saves. Attacks against it have advantage.",
+    "body": "- A restrained creature's speed becomes 0, and it can't benefit from any bonus to its speed.\n- Attack rolls against the creature have advantage, and the creature's attack rolls have disadvantage.\n- The creature has disadvantage on Dexterity saving throws.",
+    "related": [
+      "grappled"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "stunned",
+    "term": "Stunned",
+    "category": "conditions",
+    "short": "Incapacitated, can barely speak. Fails Str and Dex saves. Attacks against it have advantage.",
+    "body": "- A stunned creature is incapacitated (see the condition), can't move, and can speak only falteringly.\n- The creature automatically fails Strength and Dexterity saving throws.\n- Attack rolls against the creature have advantage.",
+    "changedIn2024": "Speaking is covered by Incapacitated, which now stops you from speaking at all."
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "unconscious",
+    "term": "Unconscious",
+    "category": "conditions",
+    "short": "Incapacitated and prone, drops what it holds. Hits from within 5 ft are crits.",
+    "body": "- An unconscious creature is incapacitated (see the condition), can't move or speak, and is unaware of its surroundings.\n- The creature drops whatever it's holding and falls prone.\n- The creature automatically fails Strength and Dexterity saving throws.\n- Attack rolls against the creature have advantage.\n- Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.",
+    "related": [
+      "dropping-to-0-hp"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "concentration",
+    "term": "Concentration",
+    "category": "conditions",
+    "short": "When it takes damage, Con save DC 10 or half the damage, whichever is higher.",
+    "body": "Some spells require you to maintain concentration in order to keep their magic active. If you lose concentration, such a spell ends.\n\nIf a spell must be maintained with concentration, that fact appears in its Duration entry, and the spell specifies how long you can concentrate on it. You can end concentration at any time (no action required).\n\nNormal activity, such as moving and attacking, doesn't interfere with concentration. The following factors can break concentration:\n- **Casting another spell that requires concentration.** You lose concentration on a spell if you cast another spell that requires concentration. You can't concentrate on two spells at once.\n- **Taking damage.** Whenever you take damage while you are concentrating on a spell, you must make a Constitution saving throw to maintain your concentration. The DC equals 10 or half the damage you take, whichever number is higher. If you take damage from multiple sources, such as an arrow and a dragon's breath, you make a separate saving throw for each source of damage.\n- **Being incapacitated or killed.** You lose concentration on a spell if you are incapacitated or if you die.\n\nThe GM might also decide that certain environmental phenomena, such as a wave crashing over you while you're on a storm-tossed ship, require you to succeed on a DC 10 Constitution saving throw to maintain concentration on a spell.",
+    "aliases": [
+      "concentrating"
+    ],
+    "related": [
+      "incapacitated",
+      "dropping-to-0-hp"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "combat-flow",
+    "term": "Combat Flow",
+    "category": "combat",
+    "short": "Determine surprise, place combatants, roll initiative, then take turns until the fight ends.",
+    "body": "1.  **Determine surprise.** The GM determines whether anyone involved in the combat encounter is surprised.\n2.  **Establish positions.** The GM decides where all the characters and monsters are located. Given the adventurers' marching order or their stated positions in the room or other location, the GM figures out where the adversaries are/how far away and in what direction.\n3.  **Roll initiative.** Everyone involved in the combat encounter rolls initiative, determining the order of combatants' turns.\n4.  **Take turns.** Each participant in the battle takes a turn in initiative order.\n5.  **Begin the next round.** When everyone involved in the combat has had a turn, the round ends. Repeat step 4 until the fighting stops.",
+    "related": [
+      "your-turn",
+      "surprise"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "your-turn",
+    "term": "Your Turn",
+    "category": "combat",
+    "short": "Move, one action, a bonus action only if something grants it, and one free object interaction.",
+    "body": "On your turn, you can **move** a distance up to your speed and **take one action**. You decide whether to move first or take your action first. Your speed--sometimes called your walking speed--is noted on your character sheet.\n\nThe most common actions you can take are described in the \"Actions in Combat\" section later in this chapter. Many class features and other abilities provide additional options for your action.\n\nThe \"Movement and Position\" section later in this chapter gives the rules for your move.\n\nYou can forgo moving, taking an action, or doing anything at all on your turn. If you can't decide what to do on your turn, consider taking the Dodge or Ready action, as described in \"Actions in Combat.\"\n\n**Bonus Actions**\n\nVarious class features, spells, and other abilities let you take an additional action on your turn called a bonus action. The Cunning Action feature, for example, allows a rogue to take a bonus action. You can take a bonus action only when a special ability, spell, or other feature of the game states that you can do something as a bonus action. You otherwise don't have a bonus action to take.\n\nYou can take only one bonus action on your turn, so you must choose which bonus action to use when you have more than one available.\n\nYou choose when to take a bonus action during your turn, unless the bonus action's timing is specified, and anything that deprives you of your ability to take actions also prevents you from taking a bonus action.\n\n**Other Activity on Your Turn**\n\nYour turn can include a variety of flourishes that require neither your action nor your move.\n\nYou can communicate however you are able, through brief utterances and gestures, as you take your turn.\n\nYou can also interact with one object or feature of the environment for free, during either your move or your action. For example, you could open a door during your move as you stride toward a foe, or you could draw your weapon as part of the same action you use to attack.\n\nIf you want to interact with a second object, you need to use your action. Some magic items and other special objects always require an action to use, as stated in their descriptions.\n\nThe GM might require you to use an action for any of these activities when it needs special care or when it presents an unusual obstacle. For instance, the GM could reasonably expect you to use an action to open a stuck door or turn a crank to lower a drawbridge.\n\nCertain special abilities, spells, and situations allow you to take a special action called a reaction. A reaction is an instant response to a trigger of some kind, which can occur on your turn or on someone else's. The opportunity attack, described later in this chapter, is the most common type of reaction.\n\nWhen you take a reaction, you can't take another one until the start of your next turn. If the reaction interrupts another creature's turn, that creature can continue its turn right after the reaction.",
+    "related": [
+      "combat-flow",
+      "ready"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "attack",
+    "term": "Attack",
+    "category": "combat",
+    "short": "The most common action to take in combat is the Attack action, whether you are swinging a sword, firing an arrow from a bow, or brawling with your fists.",
+    "body": "The most common action to take in combat is the Attack action, whether you are swinging a sword, firing an arrow from a bow, or brawling with your fists.\n\nWith this action, you make one melee or ranged attack. See the \"Making an Attack\" section for the rules that govern attacks.\n\nCertain features, such as the Extra Attack feature of the fighter, allow you to make more than one attack with this action.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "cast-a-spell",
+    "term": "Cast a Spell",
+    "category": "combat",
+    "short": "Spellcasters such as wizards and clerics, as well as many monsters, have access to spells and can use them to great effect in combat.",
+    "body": "Spellcasters such as wizards and clerics, as well as many monsters, have access to spells and can use them to great effect in combat. Each spell has a casting time, which specifies whether the caster must use an action, a reaction, minutes, or even hours to cast the spell. Casting a spell is, therefore, not necessarily an action. Most spells do have a casting time of 1 action, so a spellcaster often uses his or her action in combat to cast such a spell.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "dash",
+    "term": "Dash",
+    "category": "combat",
+    "short": "When you take the Dash action, you gain extra movement for the current turn.",
+    "body": "When you take the Dash action, you gain extra movement for the current turn. The increase equals your speed, after applying any modifiers. With a speed of 30 feet, for example, you can move up to 60 feet on your turn if you dash.\n\nAny increase or decrease to your speed changes this additional movement by the same amount. If your speed of 30 feet is reduced to 15 feet, for instance, you can move up to 30 feet this turn if you dash.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "disengage",
+    "term": "Disengage",
+    "category": "combat",
+    "short": "If you take the Disengage action, your movement doesn't provoke opportunity attacks for the rest of the turn.",
+    "body": "If you take the Disengage action, your movement doesn't provoke opportunity attacks for the rest of the turn.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "dodge",
+    "term": "Dodge",
+    "category": "combat",
+    "short": "When you take the Dodge action, you focus entirely on avoiding attacks.",
+    "body": "When you take the Dodge action, you focus entirely on avoiding attacks. Until the start of your next turn, any attack roll made against you has disadvantage if you can see the attacker, and you make Dexterity saving throws with advantage. You lose this benefit if you are incapacitated (as explained in appendix PH-A) or if your speed drops to 0.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "help",
+    "term": "Help",
+    "category": "combat",
+    "short": "You can lend your aid to another creature in the completion of a task.",
+    "body": "You can lend your aid to another creature in the completion of a task. When you take the Help action, the creature you aid gains advantage on the next ability check it makes to perform the task you are helping with, provided that it makes the check before the start of your next turn.\n\nAlternatively, you can aid a friendly creature in attacking a creature within 5 feet of you. You feint, distract the target, or in some other way team up to make your ally's attack more effective. If your ally attacks the target before your next turn, the first attack roll is made with advantage.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "hide",
+    "term": "Hide",
+    "category": "combat",
+    "short": "When you take the Hide action, you make a Dexterity (Stealth) check in an attempt to hide, following the rules for hiding.",
+    "body": "When you take the Hide action, you make a Dexterity (Stealth) check in an attempt to hide, following the rules for hiding. If you succeed, you gain certain benefits, as described in the \"Unseen Attackers and Targets\" section later in this chapter.",
+    "changedIn2024": "Hide is a DC 15 Dexterity (Stealth) check, and a success gives you the Invisible condition.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "ready",
+    "term": "Ready",
+    "category": "combat",
+    "short": "Sometimes you want to get the jump on a foe or wait for a particular circumstance before you act.",
+    "body": "Sometimes you want to get the jump on a foe or wait for a particular circumstance before you act. To do so, you can take the Ready action on your turn, which lets you act using your reaction before the start of your next turn.\n\nFirst, you decide what perceivable circumstance will trigger your reaction. Then, you choose the action you will take in response to that trigger, or you choose to move up to your speed in response to it. Examples include \"If the cultist steps on the trapdoor, I'll pull the lever that opens it,\" and \"If the goblin steps next to me, I move away.\"\n\nWhen the trigger occurs, you can either take your reaction right after the trigger finishes or ignore the trigger. Remember that you can take only one reaction per round.\n\nWhen you ready a spell, you cast it as normal but hold its energy, which you release with your reaction when the trigger occurs. To be readied, a spell must have a casting time of 1 action, and holding onto the spell's magic requires concentration. If your concentration is broken, the spell dissipates without taking effect. For example, if you are concentrating on the *web* spell and ready *magic missile*, your *web* spell ends, and if you take damage before you release *magic missile* with your reaction, your concentration might be broken.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "search",
+    "term": "Search",
+    "category": "combat",
+    "short": "When you take the Search action, you devote your attention to finding something.",
+    "body": "When you take the Search action, you devote your attention to finding something. Depending on the nature of your search, the GM might have you make a Wisdom (Perception) check or an Intelligence (Investigation) check.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "use-an-object",
+    "term": "Use an Object",
+    "category": "combat",
+    "short": "You normally interact with an object while doing something else, such as when you draw a sword as part of an attack.",
+    "body": "You normally interact with an object while doing something else, such as when you draw a sword as part of an attack. When an object requires your action for its use, you take the Use an Object action. This action is also useful when you want to interact with more than one object on your turn.",
+    "related": [
+      "your-turn"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "opportunity-attacks",
+    "term": "Opportunity Attacks",
+    "category": "combat",
+    "short": "In a fight, everyone is constantly watching for a chance to strike an enemy who is fleeing or passing by.",
+    "body": "In a fight, everyone is constantly watching for a chance to strike an enemy who is fleeing or passing by. Such a strike is called an opportunity attack.\n\nYou can make an opportunity attack when a hostile creature that you can see moves out of your reach. To make the opportunity attack, you use your reaction to make one melee attack against the provoking creature. The attack occurs right before the creature leaves your reach.\n\nYou can avoid provoking an opportunity attack by taking the Disengage action. You also don't provoke an opportunity attack when you teleport or when someone or something moves you without using your movement, action, or reaction. For example, you don't provoke an opportunity attack if an explosion hurls you out of a foe's reach or if gravity causes you to fall past an enemy.",
+    "aliases": [
+      "aoo"
+    ],
+    "related": [
+      "disengage"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "cover",
+    "term": "Cover",
+    "category": "combat",
+    "short": "Half cover +2 AC and Dex saves. Three-quarters cover +5. Total cover can't be targeted.",
+    "body": "Walls, trees, creatures, and other obstacles can provide cover during combat, making a target more difficult to harm. A target can benefit from cover only when an attack or other effect originates on the opposite side of the cover.\n\nThere are three degrees of cover. If a target is behind multiple sources of cover, only the most protective degree of cover applies; the degrees aren't added together. For example, if a target is behind a creature that gives half cover and a tree trunk that gives three-quarters cover, the target has three-quarters cover.\n\nA target with **half cover** has a +2 bonus to AC and Dexterity saving throws. A target has half cover if an obstacle blocks at least half of its body. The obstacle might be a low wall, a large piece of furniture, a narrow tree trunk, or a creature, whether that creature is an enemy or a friend.\n\nA target with **three-quarters cover** has a +5 bonus to AC and Dexterity saving throws. A target has three-quarters cover if about three-quarters of it is covered by an obstacle. The obstacle might be a portcullis, an arrow slit, or a thick tree trunk.\n\nA target with **total cover** can't be targeted directly by an attack or a spell, although some spells can reach such a target by including it in an area of effect. A target has total cover if it is completely concealed by an obstacle.",
+    "aliases": [
+      "half cover",
+      "three-quarters cover"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "dropping-to-0-hp",
+    "term": "Dropping to 0 HP",
+    "category": "combat",
+    "short": "Death saves are DC 10. Three successes stabilize, three failures die. A nat 20 means 1 HP.",
+    "body": "When you drop to 0 hit points, you either die outright or fall unconscious, as explained in the following sections.\n\n**Instant Death**\n\nMassive damage can kill you instantly. When damage reduces you to 0 hit points and there is damage remaining, you die if the remaining damage equals or exceeds your hit point maximum.\n\nFor example, a cleric with a maximum of 12 hit points currently has 6 hit points. If she takes 18 damage from an attack, she is reduced to 0 hit points, but 12 damage remains. Because the remaining damage equals her hit point maximum, the cleric dies.\n\n**Falling Unconscious**\n\nIf damage reduces you to 0 hit points and fails to kill you, you fall unconscious (see appendix PH-A). This unconsciousness ends if you regain any hit points.\n\n**Death Saving Throws**\n\nWhenever you start your turn with 0 hit points, you must make a special saving throw, called a death saving throw, to determine whether you creep closer to death or hang onto life. Unlike other saving throws, this one isn't tied to any ability score. You are in the hands of fate now, aided only by spells and features that improve your chances of succeeding on a saving throw.\n\nRoll a d20. If the roll is 10 or higher, you succeed. Otherwise, you fail. A success or failure has no effect by itself. On your third success, you become stable (see below). On your third failure, you die. The successes and failures don't need to be consecutive; keep track of both until you collect three of a kind. The number of both is reset to zero when you regain any hit points or become stable.\n\n**Rolling 1 or 20.** When you make a death saving throw and roll a 1 on the d20, it counts as two failures. If you roll a 20 on the d20, you regain 1 hit point.\n\n**Damage at 0 Hit Points.** If you take any damage while you have 0 hit points, you suffer a death saving throw failure. If the damage is from a critical hit, you suffer two failures instead. If the damage equals or exceeds your hit point maximum, you suffer instant death.\n\n**Stabilizing a Creature**\n\nThe best way to save a creature with 0 hit points is to heal it. If healing is unavailable, the creature can at least be stabilized so that it isn't killed by a failed death saving throw.\n\nYou can use your action to administer first aid to an unconscious creature and attempt to stabilize it, which requires a successful DC 10 Wisdom (Medicine) check.\n\nA **stable** creature doesn't make death saving throws, even though it has 0 hit points, but it does remain unconscious. The creature stops being stable, and must start making death saving throws again, if it takes any damage. A stable creature that isn't healed regains 1 hit point after 1d4 hours.\n\n**Monsters and Death**\n\nMost GMs have a monster die the instant it drops to 0 hit points, rather than having it fall unconscious and make death saving throws.\n\nMighty villains and special nonplayer characters are common exceptions; the GM might have them fall unconscious and follow the same rules as player characters.",
+    "aliases": [
+      "death save",
+      "death saves",
+      "stable"
+    ],
+    "related": [
+      "unconscious",
+      "concentration"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "grappling-and-shoving",
+    "term": "Grappling & Shoving",
+    "category": "combat",
+    "short": "Use an attack to grab a creature or to knock it prone or push it away.",
+    "body": "When you want to grab a creature or wrestle with it, you can use the Attack action to make a special melee attack, a grapple. If you're able to make multiple attacks with the Attack action, this attack replaces one of them.\n\nThe target of your grapple must be no more than one size larger than you and must be within your reach. Using at least one free hand, you try to seize the target by making a grapple check instead of an attack roll: a Strength (Athletics) check contested by the target's Strength (Athletics) or Dexterity (Acrobatics) check (the target chooses the ability to use). If you succeed, you subject the target to the grappled condition (see appendix PH-A). The condition specifies the things that end it, and you can release the target whenever you like (no action required).\n\n**Escaping a Grapple.** A grappled creature can use its action to escape. To do so, it must succeed on a Strength (Athletics) or Dexterity (Acrobatics) check contested by your Strength\n(Athletics) check.\n\n**Moving a Grappled Creature.** When you move, you can drag or carry the grappled creature with you, but your speed is halved, unless the creature is two or more sizes smaller than you.\n\nUsing the Attack action, you can make a special melee attack to shove a creature, either to knock it prone or push it away from you. If you're able to make multiple attacks with the Attack action, this attack replaces one of them.\n\nThe target must be no more than one size larger than you and must be within your reach. Instead of making an attack roll, you make a Strength (Athletics) check contested by the target's Strength (Athletics) or Dexterity (Acrobatics) check (the target chooses the ability to use). If you win the contest, you either knock the target prone or push it 5 feet away from you.",
+    "aliases": [
+      "shove",
+      "grapple"
+    ],
+    "related": [
+      "grappled",
+      "prone"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "two-weapon-fighting",
+    "term": "Two-Weapon Fighting",
+    "category": "combat",
+    "short": "When you take the Attack action and attack with a light melee weapon that you're holding in one hand, you can use a bonus action to attack with a different…",
+    "body": "When you take the Attack action and attack with a light melee weapon that you're holding in one hand, you can use a bonus action to attack with a different light melee weapon that you're holding in the other hand. You don't add your ability modifier to the damage of the bonus attack, unless that modifier is negative.\n\nIf either weapon has the thrown property, you can throw the weapon, instead of making a melee attack with it.",
+    "aliases": [
+      "dual wield",
+      "two weapon"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "surprise",
+    "term": "Surprise",
+    "category": "combat",
+    "short": "A band of adventurers sneaks up on a bandit camp, springing from the trees to attack them.",
+    "body": "A band of adventurers sneaks up on a bandit camp, springing from the trees to attack them. A gelatinous cube glides down a dungeon passage, unnoticed by the adventurers until the cube engulfs one of them. In these situations, one side of the battle gains surprise over the other.\n\nThe GM determines who might be surprised. If neither side tries to be stealthy, they automatically notice each other. Otherwise, the GM compares the Dexterity (Stealth) checks of anyone hiding with the passive Wisdom (Perception) score of each creature on the opposing side. Any character or monster that doesn't notice a threat is surprised at the start of the encounter.\n\nIf you're surprised, you can't move or take an action on your first turn of the combat, and you can't take a reaction until that turn ends. A member of a group can be surprised even if the other members aren't.",
+    "changedIn2024": "A surprised creature rolls initiative with disadvantage instead of skipping its first turn.",
+    "related": [
+      "combat-flow",
+      "hide"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "Written for this app",
+    "id": "holding-your-action",
+    "term": "Holding Your Action",
+    "category": "combat",
+    "short": "Leave your place in initiative and act later, before someone else's turn.",
+    "body": "Holding in this tracker means leaving the initiative order so you can act later. It is not the Grappled condition, and it is not the Ready action.\n\nPress **Hold** on your turn. The row stays marked **Holding**. Press **Act now** when that creature should act, ahead of whoever is currently up.\n\nThe Ready action is the rules version: you choose a trigger, then spend your reaction when it happens.",
+    "related": [
+      "ready",
+      "grappled"
+    ],
+    "aliases": [
+      "hold",
+      "delay",
+      "act now"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "movement",
+    "term": "Movement",
+    "category": "movement",
+    "short": "Difficult terrain, climbing, swimming, and crawling cost 1 extra foot per foot. Standing costs half your speed.",
+    "body": "Combat rarely takes place in bare rooms or on featureless plains. Boulder-strewn caverns, briar-choked forests, treacherous staircases-the setting of a typical fight contains difficult terrain.\n\nEvery foot of movement in difficult terrain costs 1 extra foot. This rule is true even if multiple things in a space count as difficult terrain.\n\nLow furniture, rubble, undergrowth, steep stairs, snow, and shallow bogs are examples of difficult terrain. The space of another creature, whether hostile or not, also counts as difficult terrain.\n\nWhile climbing or swimming, each foot of movement costs 1 extra foot (2 extra feet in difficult terrain), unless a creature has a climbing or swimming speed. At the GM's option, climbing a slippery vertical surface or one with few handholds requires a successful Strength (Athletics) check. Similarly, gaining any distance in rough water might require a successful Strength (Athletics) check.\n\nCombatants often find themselves lying on the ground, either because they are knocked down or because they throw themselves down. In the game, they are prone, a condition described in appendix PH-A.\n\nYou can **drop prone** without using any of your speed. **Standing up** takes more effort; doing so costs an amount of movement equal to half your speed. For example, if your speed is 30 feet, you must spend\n\n15 feet of movement to stand up. You can't stand up if you don't have enough movement left or if your speed is 0.\n\nTo move while prone, you must **crawl** or use magic such as teleportation. Every foot of movement while crawling costs 1 extra foot. Crawling 1 foot in difficult terrain, therefore, costs 3 feet of movement.",
+    "related": [
+      "jumping",
+      "prone"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "jumping",
+    "term": "Jumping",
+    "category": "movement",
+    "short": "Long jump is your Strength score in feet with a 10-foot run. High jump is 3 + your Strength modifier.",
+    "body": "Your Strength determines how far you can jump.\n\n**Long Jump.** When you make a long jump, you cover a number of feet up to your Strength score if you move at least 10 feet on foot immediately before the jump. When you make a standing long jump, you can leap only half that distance. Either way, each foot you clear on the jump costs a foot of movement.\n\nThis rule assumes that the height of your jump doesn't matter, such as a jump across a stream or chasm. At your GM's option, you must succeed on a DC 10 Strength (Athletics) check to clear a low obstacle (no taller than a quarter of the jump's distance), such as a hedge or low wall. Otherwise, you hit it.\n\nWhen you land in difficult terrain, you must succeed on a DC 10 Dexterity (Acrobatics) check to land on your feet. Otherwise, you land prone.\n\n**High Jump.** When you make a high jump, you leap into the air a number of feet equal to 3 + your Strength modifier if you move at least 10 feet on foot immediately before the jump. When you make a standing high jump, you can jump only half that distance. Either way, each foot you clear on the jump costs a foot of movement. In some circumstances, your GM might allow you to make a Strength (Athletics) check to jump higher than you normally can.\n\nYou can extend your arms half your height above yourself during the jump. Thus, you can reach above you a distance equal to the height of the jump plus 1.5 times your height.",
+    "aliases": [
+      "long jump",
+      "high jump"
+    ],
+    "related": [
+      "movement"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "travel-pace",
+    "term": "Travel Pace",
+    "category": "movement",
+    "short": "Fast 4 miles an hour, normal 3, slow 2. A fast pace penalizes passive Perception.",
+    "body": "While traveling, a group of adventurers can move at a normal, fast, or slow pace, as shown on the Travel Pace table. The table states how far the party can move in a period of time and whether the pace has any effect. A fast pace makes characters less perceptive, while a slow pace makes it possible to sneak around and to search an area more carefully.\n\n**Forced March.** The Travel Pace table assumes that characters travel for 8 hours in day. They can push on beyond that limit, at the risk of exhaustion.\n\nFor each additional hour of travel beyond 8 hours, the characters cover the distance shown in the Hour column for their pace, and each character must make a Constitution saving throw at the end of the hour. The DC is 10 + 1 for each hour past 8 hours. On a failed saving throw, a character suffers one level of exhaustion (see appendix PH-A).\n\n**Mounts and Vehicles.** For short spans of time (up to an hour), many animals move much faster than humanoids. A mounted character can ride at a gallop for about an hour, covering twice the usual distance for a fast pace. If fresh mounts are available every 8 to 10 miles, characters can cover larger distances at this pace, but this is very rare except in densely populated areas.\n\nCharacters in wagons, carriages, or other land vehicles choose a pace as normal. Characters in a waterborne vessel are limited to the speed of the vessel, and they don't suffer penalties for a fast pace or gain benefits from a slow pace. Depending on the vessel and the size of the crew, ships might be able to travel for up to 24 hours per day.\n\nCertain special mounts, such as a pegasus or griffon, or special vehicles, such as a *carpet of flying*, allow you to travel more swiftly.\n\n**Travel Pace**",
+    "table": {
+      "columns": [
+        "Pace",
+        "Distance per: Minute",
+        "Hour",
+        "Day",
+        "Effect"
+      ],
+      "rows": [
+        [
+          "Fast",
+          "400 feet",
+          "4 miles",
+          "30 miles",
+          "-5 penalty to passive Wisdom (Perception) scores"
+        ],
+        [
+          "Normal",
+          "300 feet",
+          "3 miles",
+          "24 miles",
+          "-"
+        ],
+        [
+          "Slow",
+          "200 feet",
+          "2 miles",
+          "18 miles",
+          "Able to use stealth"
+        ]
+      ]
+    },
+    "aliases": [
+      "pace",
+      "forced march"
+    ],
+    "related": [
+      "vision-and-light"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "vision-and-light",
+    "term": "Vision & Light",
+    "category": "movement",
+    "short": "Dim light is lightly obscured. Darkness is heavily obscured. Darkvision treats darkness as dim light.",
+    "body": "The most fundamental tasks of adventuring--noticing danger, finding hidden objects, hitting an enemy in combat, and targeting a spell, to name just a few--rely heavily on a character's ability to see. Darkness and other effects that obscure vision can prove a significant hindrance.\n\nA given area might be lightly or heavily obscured. In a **lightly obscured** area, such as dim light, patchy fog, or moderate foliage, creatures have disadvantage on Wisdom (Perception) checks that rely on sight.\n\nA **heavily obscured** area-such as darkness, opaque fog, or dense foliage-blocks vision entirely. A creature effectively suffers from the blinded condition (see appendix PH-A) when trying to see something in that area.\n\nThe presence or absence of light in an environment creates three categories of illumination: bright light, dim light, and darkness.\n\n**Bright light** lets most creatures see normally.\n\nEven gloomy days provide bright light, as do torches, lanterns, fires, and other sources of illumination within a specific radius.\n\n**Dim light**, also called shadows, creates a lightly obscured area. An area of dim light is usually a boundary between a source of bright light, such as a torch, and surrounding darkness. The soft light of twilight and dawn also counts as dim light. A particularly brilliant full moon might bathe the land in dim light.\n\n**Darkness** creates a heavily obscured area.\n\nCharacters face darkness outdoors at night (even most moonlit nights), within the confines of an unlit dungeon or a subterranean vault, or in an area of magical darkness.\n\n**Blindsight**\n\nA creature with blindsight can perceive its surroundings without relying on sight, within a specific radius. Creatures without eyes, such as oozes, and creatures with echolocation or heightened senses, such as bats and true dragons, have this sense.\n\n**Darkvision**\n\nMany creatures in fantasy gaming worlds, especially those that dwell underground, have darkvision. Within a specified range, a creature with darkvision can see in darkness as if the darkness were dim light, so areas of darkness are only lightly obscured as far as that creature is concerned. However, the creature can't discern color in darkness, only shades of gray.\n\n**Truesight**\n\nA creature with truesight can, out to a specific range, see in normal and magical darkness, see invisible creatures and objects, automatically detect visual illusions and succeed on saving throws against them, and perceives the original form of a shapechanger or a creature that is transformed by magic. Furthermore, the creature can see into the Ethereal Plane.",
+    "aliases": [
+      "dark",
+      "darkvision",
+      "light"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "resting",
+    "term": "Resting",
+    "category": "movement",
+    "short": "A short rest is 1 hour. A long rest is 8 hours and restores all hit points, once per day.",
+    "body": "Heroic though they might be, adventurers can't spend every hour of the day in the thick of exploration, social interaction, and combat. They need rest-time to sleep and eat, tend their wounds, refresh their minds and spirits for spellcasting, and brace themselves for further adventure.\n\nAdventurers can take short rests in the midst of an adventuring day and a long rest to end the day.\n\nA short rest is a period of downtime, at least 1 hour long, during which a character does nothing more strenuous than eating, drinking, reading, and tending to wounds.\n\nA character can spend one or more Hit Dice at the end of a short rest, up to the character's maximum number of Hit Dice, which is equal to the character's level. For each Hit Die spent in this way, the player rolls the die and adds the character's Constitution modifier to it. The character regains hit points equal to the total. The player can decide to spend an additional Hit Die after each roll. A character regains some spent Hit Dice upon finishing a long rest, as explained below.\n\nA long rest is a period of extended downtime, at least 8 hours long, during which a character sleeps or performs light activity: reading, talking, eating, or standing watch for no more than 2 hours. If the rest is interrupted by a period of strenuous activity-at least 1 hour of walking, fighting, casting spells, or similar adventuring activity-the characters must begin the rest again to gain any benefit from it.\n\nAt the end of a long rest, a character regains all lost hit points. The character also regains spent Hit Dice, up to a number of dice equal to half of the character's total number of them (minimum of one die). For example, if a character has eight Hit Dice, he or she can regain four spent Hit Dice upon finishing a long rest.\n\nA character can't benefit from more than one long rest in a 24-hour period, and a character must have at least 1 hit point at the start of the rest to gain its benefits.",
+    "aliases": [
+      "short rest",
+      "long rest"
+    ],
+    "related": [
+      "exhaustion"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "falling",
+    "term": "Falling",
+    "category": "hazards",
+    "short": "A fall from a great height is one of the most common hazards facing an adventurer.",
+    "body": "A fall from a great height is one of the most common hazards facing an adventurer. At the end of a fall, a creature takes 1d6 bludgeoning damage for every 10 feet it fell, to a maximum of 20d6. The creature lands prone, unless it avoids taking damage from the fall.",
+    "related": [
+      "prone"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "suffocating",
+    "term": "Suffocating",
+    "category": "hazards",
+    "short": "A creature can hold its breath for a number of minutes equal to 1 + its Constitution modifier (minimum of 30 seconds).",
+    "body": "A creature can hold its breath for a number of minutes equal to 1 + its Constitution modifier (minimum of 30 seconds).\n\nWhen a creature runs out of breath or is choking, it can survive for a number of rounds equal to its Constitution modifier (minimum of 1 round). At the start of its next turn, it drops to 0 hit points and is dying, and it can't regain hit points or be stabilized until it can breathe again.\n\nFor example, a creature with a Constitution of 14 can hold its breath for 3 minutes. If it starts suffocating, it has 2 rounds to reach air before it drops to 0 hit points.",
+    "aliases": [
+      "holding breath",
+      "drowning"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "Written for this app",
+    "id": "burning",
+    "term": "Burning",
+    "category": "hazards",
+    "short": "In 2014, burning depends on the source. Alchemist's fire is 1d4 fire at the start of each turn.",
+    "body": "In the 2014 rules, what burning does depends on the source. Alchemist's fire deals 1d4 fire damage at the start of each of the target's turns. A creature can use its action to make a DC 10 Dexterity check to put that fire out.",
+    "changedIn2024": "A burning creature takes 1d4 fire damage at the start of each of its turns until an action puts the fire out."
+  },
+  {
+    "edition": "2014",
+    "source": "Written for this app",
+    "id": "extreme-cold",
+    "term": "Extreme Cold",
+    "category": "hazards",
+    "short": "Constitution save DC 10 each hour or gain 1 exhaustion. Cold protection succeeds automatically.",
+    "body": "At 0 degrees Fahrenheit or colder, a creature makes a DC 10 Constitution saving throw at the end of each hour or gains 1 level of exhaustion. A creature with resistance or immunity to cold damage, or wearing cold-weather gear, succeeds automatically.",
+    "related": [
+      "exhaustion"
+    ],
+    "aliases": [
+      "cold",
+      "freezing"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "Written for this app",
+    "id": "extreme-heat",
+    "term": "Extreme Heat",
+    "category": "hazards",
+    "short": "Without water, a Constitution save each hour, DC 5 and rising, or gain 1 exhaustion.",
+    "body": "At 100 degrees Fahrenheit or hotter, a creature without water makes a Constitution saving throw at the end of each hour or gains 1 level of exhaustion. The DC starts at 5 and rises by 1 each hour. Medium or heavy armor, or heavy clothing, imposes disadvantage. Resistance or immunity to fire damage succeeds automatically.",
+    "related": [
+      "exhaustion"
+    ],
+    "aliases": [
+      "heat"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "Written for this app",
+    "id": "frigid-water",
+    "term": "Frigid Water",
+    "category": "hazards",
+    "short": "Safe for a number of minutes equal to your Constitution score, then a DC 10 save each minute.",
+    "body": "A creature can be immersed in frigid water for a number of minutes equal to its Constitution score. After that, it makes a DC 10 Constitution saving throw each minute or gains 1 level of exhaustion.",
+    "related": [
+      "exhaustion",
+      "suffocating"
+    ],
+    "aliases": [
+      "freezing water"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "Written for this app",
+    "id": "high-altitude",
+    "term": "High Altitude",
+    "category": "hazards",
+    "short": "Above 10,000 feet, each hour of travel counts as two toward the day's limit.",
+    "body": "At altitudes above 10,000 feet, each hour spent traveling counts as 2 hours toward the limit on how long the party can travel in a day, unless a creature is acclimated to high altitude.",
+    "related": [
+      "travel-pace",
+      "exhaustion"
+    ],
+    "aliases": [
+      "altitude",
+      "mountain"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "Written for this app",
+    "id": "weather",
+    "term": "Weather",
+    "category": "hazards",
+    "short": "Strong wind, heavy precipitation, and fog hinder ranged attacks, Perception, or both.",
+    "body": "Strong wind imposes disadvantage on ranged weapon attacks and can extinguish open flames. Heavy precipitation imposes disadvantage on Wisdom (Perception) checks that rely on hearing or sight and extinguishes open flames. Fog and other heavy obscurement can heavily obscure the area.",
+    "related": [
+      "vision-and-light"
+    ],
+    "aliases": [
+      "wind",
+      "fog",
+      "rain"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "food-and-water",
+    "term": "Food & Water",
+    "category": "hazards",
+    "short": "Characters who don't eat or drink suffer the effects of exhaustion (see appendix PH-A).",
+    "body": "Characters who don't eat or drink suffer the effects of exhaustion (see appendix PH-A). Exhaustion caused by lack of food or water can't be removed until the character eats and drinks the full required amount.\n\n**Food**\n\nA character needs one pound of food per day and can make food last longer by subsisting on half rations. Eating half a pound of food in a day counts as half a day without food.\n\nA character can go without food for a number of days equal to 3 + his or her Constitution modifier (minimum 1). At the end of each day beyond that limit, a character automatically suffers one level of exhaustion.\n\nA normal day of eating resets the count of days without food to zero.\n\n**Water**\n\nA character needs one gallon of water per day, or two gallons per day if the weather is hot. A character who drinks only half that much water must succeed on a DC 15 Constitution saving throw or suffer one level of exhaustion at the end of the day. A character with access to even less water automatically suffers one level of exhaustion at the end of the day.\n\nIf the character already has one or more levels of exhaustion, the character takes two levels in either case.",
+    "aliases": [
+      "starvation",
+      "thirst"
+    ],
+    "related": [
+      "exhaustion"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "Written for this app",
+    "id": "improvised-damage",
+    "term": "Improvised Damage",
+    "category": "hazards",
+    "short": "Setback is about 1d10, dangerous 2d10–4d10, deadly 10d10, catastrophic 18d10–24d10.",
+    "body": "When something hurts a creature and no rule names the damage, pick a tier and stay consistent.",
+    "table": {
+      "columns": [
+        "Tier",
+        "Damage",
+        "For example"
+      ],
+      "rows": [
+        [
+          "Setback",
+          "1d10",
+          "A splash of scalding water"
+        ],
+        [
+          "Dangerous",
+          "2d10–4d10",
+          "A short fall onto jagged stone"
+        ],
+        [
+          "Deadly",
+          "10d10",
+          "A collapsing ceiling in a small room"
+        ],
+        [
+          "Catastrophic",
+          "18d10–24d10",
+          "Being caught in a collapsing fortress"
+        ]
+      ]
+    },
+    "related": [
+      "traps",
+      "falling"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "damage-types",
+    "term": "Damage Types & Resistance",
+    "category": "hazards",
+    "short": "Resistance halves damage, vulnerability doubles it, and immunity reduces it to zero.",
+    "body": "Some creatures and objects are exceedingly difficult or unusually easy to hurt with certain types of damage.\n\nIf a creature or an object has **resistance** to a damage type, damage of that type is halved against it. If a creature or an object has **vulnerability** to a damage type, damage of that type is doubled against it.\n\nResistance and then vulnerability are applied after all other modifiers to damage. For example, a creature has resistance to bludgeoning damage and is hit by an attack that deals 25 bludgeoning damage. The creature is also within a magical aura that reduces all damage by 5. The 25 damage is first reduced by 5 and then halved, so the creature takes 10 damage.\n\nMultiple instances of resistance or vulnerability that affect the same damage type count as only one instance. For example, if a creature has resistance to fire damage as well as resistance to all nonmagical damage, the damage of a nonmagical fire is reduced by half against the creature, not reduced by three-quarters.\n\n**Damage types:** Acid, Bludgeoning, Cold, Fire, Force, Lightning, Necrotic, Piercing, Poison, Psychic, Radiant, Slashing, Thunder.",
+    "aliases": [
+      "resistance",
+      "vulnerability",
+      "immunity"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "traps",
+    "term": "Traps",
+    "category": "hazards",
+    "short": "Pick a severity, then use the party's level to size the save, the attack, and the damage.",
+    "body": "When adventurers come across a trap, you need to know how the trap is triggered and what it does, as well as the possibility for the characters to detect the trap and to disable or avoid it.\n\n**Triggering a Trap**\n\nMost traps are triggered when a creature goes somewhere or touches something that the trap's creator wanted to protect. Common triggers include stepping on a pressure plate or a false section of floor, pulling a trip wire, turning a doorknob, and using the wrong key in a lock. Magic traps are often set to go off when a creature enters an area or touches an object. Some magic traps (such as the *glyph of warding* spell) have more complicated trigger conditions, including a password that prevents the trap from activating.\n\n**Detecting and Disabling a Trap**\n\nUsually, some element of a trap is visible to careful inspection. Characters might notice an uneven flagstone that conceals a pressure plate, spot the gleam of light off a trip wire, notice small holes in the walls from which jets of flame will erupt, or otherwise detect something that points to a trap's presence.\n\nA trap's description specifies the checks and DCs needed to detect it, disable it, or both. A character actively looking for a trap can attempt a Wisdom (Perception) check against the trap's DC. You can also compare the DC to detect the trap with each character's passive Wisdom (Perception) score to determine whether anyone in the party notices the trap in passing. If the adventurers detect a trap before triggering it, they might be able to disarm it, either permanently or long enough to move past it. You might call for an Intelligence (Investigation) check for a character to deduce what needs to be done, followed by a Dexterity check using thieves' tools to perform the necessary sabotage.\n\nAny character can attempt an Intelligence (Arcana) check to detect or disarm a magic trap, in addition to any other checks noted in the trap's description. The DCs are the same regardless of the check used. In addition, *dispel magic* has a chance of disabling most magic traps. A magic trap's description provides the DC for the ability check made when you use *dispel magic*.\n\nIn most cases, a trap's description is clear enough that you can adjudicate whether a character's actions locate or foil the trap. As with many situations, you shouldn't allow die rolling to override clever play and good planning. Use your common sense, drawing on the trap's description to determine what happens. No trap's design can anticipate every possible action that the characters might attempt.\n\nYou should allow a character to discover a trap without making an ability check if an action would clearly reveal the trap's presence. For example, if a character lifts a rug that conceals a pressure plate, the character has found the trigger and no check is required.\n\nFoiling traps can be a little more complicated. Consider a trapped treasure chest. If the chest is opened without first pulling on the two handles set in its sides, a mechanism inside fires a hail of poison needles toward anyone in front of it. After inspecting the chest and making a few checks, the characters are still unsure if it's trapped. Rather than simply open the chest, they prop a shield in front of it and push the chest open at a distance with an iron rod. In this case, the trap still triggers, but the hail of needles fires harmlessly into the shield.\n\nTraps are often designed with mechanisms that allow them to be disarmed or bypassed. Intelligent monsters that place traps in or around their lairs need ways to get past those traps without harming themselves. Such traps might have hidden levers that disable their triggers, or a secret door might conceal a passage that goes around the trap.\n\n**Trap Effects**\n\nThe effects of traps can range from inconvenient to deadly, making use of elements such as arrows, spikes, blades, poison, toxic gas, blasts of fire, and deep pits. The deadliest traps combine multiple elements to kill, injure, contain, or drive off any creature unfortunate enough to trigger them. A trap's description specifies what happens when it is triggered.\n\nThe attack bonus of a trap, the save DC to resist its effects, and the damage it deals can vary depending on the trap's severity. Use the Trap Save DCs and Attack Bonuses table and the Damage Severity by Level table for suggestions based on three levels of trap severity.\n\nA trap intended to be a **setback** is unlikely to kill or seriously harm characters of the indicated levels, whereas a **dangerous** trap is likely to seriously injure (and potentially kill) characters of the indicated levels. A **deadly** trap is likely to kill characters of the indicated levels.",
+    "related": [
+      "improvised-damage",
+      "typical-dcs"
+    ],
+    "table": {
+      "columns": [
+        "Severity",
+        "Save DC",
+        "Attack bonus",
+        "Lv 1–4",
+        "Lv 5–10",
+        "Lv 11–16",
+        "Lv 17–20"
+      ],
+      "rows": [
+        [
+          "Setback",
+          "10-11",
+          "+3 to +5",
+          "1d10",
+          "2d10",
+          "4d10",
+          "10d10"
+        ],
+        [
+          "Dangerous",
+          "12-15",
+          "+6 to +8",
+          "2d10",
+          "4d10",
+          "10d10",
+          "18d10"
+        ],
+        [
+          "Deadly",
+          "16-20",
+          "+9 to +12",
+          "4d10",
+          "10d10",
+          "18d10",
+          "24d10"
+        ]
+      ]
+    }
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "typical-dcs",
+    "term": "Typical DCs",
+    "category": "rulings",
+    "short": "5 very easy, 10 easy, 15 medium, 20 hard, 25 very hard, 30 nearly impossible.",
+    "body": "To make an ability check, roll a d20 and add the relevant ability modifier. As with other d20 rolls, apply bonuses and penalties, and compare the total to the DC. If the total equals or exceeds the DC, the ability check is a success-the creature overcomes the challenge at hand. Otherwise, it's a failure, which means the character or monster makes no progress toward the objective or makes progress combined with a setback determined by the GM.",
+    "table": {
+      "columns": [
+        "Task Difficulty",
+        "DC"
+      ],
+      "rows": [
+        [
+          "Very easy",
+          "5"
+        ],
+        [
+          "Easy",
+          "10"
+        ],
+        [
+          "Medium",
+          "15"
+        ],
+        [
+          "Hard",
+          "20"
+        ],
+        [
+          "Very hard",
+          "25"
+        ],
+        [
+          "Nearly impossible",
+          "30"
+        ]
+      ]
+    }
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "object-ac",
+    "term": "Object AC",
+    "category": "rulings",
+    "short": "Cloth 11, glass 13, wood 15, stone 17, steel 19, mithral 21, adamantine 23.",
+    "body": "When time is a factor, you can assign an Armor Class and hit points to a destructible object. You can also give it immunities, resistances, and vulnerabilities to specific types of damage.\n\n**Armor Class.** An object's Armor Class is a measure of how difficult it is to deal damage to the object when striking it (because the object has no chance of dodging out of the way). The Object Armor Class table provides suggested AC values for various substances.\n\n**Object Armor Class**",
+    "table": {
+      "columns": [
+        "Substance",
+        "AC"
+      ],
+      "rows": [
+        [
+          "Cloth, paper, rope",
+          "11"
+        ],
+        [
+          "Crystal, glass, ice",
+          "13"
+        ],
+        [
+          "Wood, bone",
+          "15"
+        ],
+        [
+          "Stone",
+          "17"
+        ],
+        [
+          "Iron, steel",
+          "19"
+        ],
+        [
+          "Mithral",
+          "21"
+        ],
+        [
+          "Adamantine",
+          "23"
+        ]
+      ]
+    },
+    "related": [
+      "object-hp"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "object-hp",
+    "term": "Object HP",
+    "category": "rulings",
+    "short": "Fragile to resilient: tiny 2/5, small 3/10, medium 4/18, large 5/27.",
+    "body": "**Hit Points.** An object's hit points measure how much damage it can take before losing its structural integrity. Resilient objects have more hit points than fragile ones. Large objects also tend to have more hit points than small ones, unless breaking a small part of the object is just as effective as breaking the whole thing. The Object Hit Points table provides suggested hit points for fragile and resilient objects that are Large or smaller.\n\n**Object Hit Points**\n\n**Huge and Gargantuan Objects.** Normal weapons are of little use against many Huge and Gargantuan objects, such as a colossal statue, towering column of stone, or massive boulder. That said, one torch can burn a Huge tapestry, and an *earthquake* spell can reduce a colossus to rubble. You can track a Huge or Gargantuan object's hit points if you like, or you can simply decide how long the object can withstand whatever weapon or force is acting against it. If you track hit points for the object, divide it into Large or smaller sections, and track each section's hit points separately. Destroying one of those sections could ruin the entire object. For example, a Gargantuan statue of a human might topple over when one of its Large legs is reduced to 0 hit points.\n\n**Objects and Damage Types.** Objects are immune to poison and psychic damage. You might decide that some damage types are more effective against a particular object or substance than others. For example, bludgeoning damage works well for smashing things but not for cutting through rope or leather. Paper or cloth objects might be vulnerable to fire and lightning damage. A pick can chip away stone but can't effectively cut down a tree. As always, use your best judgment.\n\n**Damage Threshold.** Big objects such as castle walls often have extra resilience represented by a damage threshold. An object with a damage threshold has immunity to all damage unless it takes an amount of damage from a single attack or effect equal to or greater than its damage threshold, in which case it takes damage as normal. Any damage that fails to meet or exceed the object's damage threshold is considered superficial and doesn't reduce the object's hit points.",
+    "table": {
+      "columns": [
+        "Size",
+        "Fragile",
+        "Resilient"
+      ],
+      "rows": [
+        [
+          "Tiny (bottle, lock)",
+          "2 (1d4)",
+          "5 (2d4)"
+        ],
+        [
+          "Small (chest, lute)",
+          "3 (1d6)",
+          "10 (3d6)"
+        ],
+        [
+          "Medium (barrel, chandelier)",
+          "4 (1d8)",
+          "18 (4d8)"
+        ],
+        [
+          "Large (cart, 10-ft.-by-10-ft. window)",
+          "5 (1d10)",
+          "27 (5d10)"
+        ]
+      ]
+    },
+    "related": [
+      "object-ac"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "advantage",
+    "term": "Advantage & Disadvantage",
+    "category": "rulings",
+    "short": "Roll a second d20. Advantage uses the higher die, disadvantage the lower. They don't stack.",
+    "body": "Sometimes a special ability or spell tells you that you have advantage or disadvantage on an ability check, a saving throw, or an attack roll. When that happens, you roll a second d20 when you make the roll. Use the higher of the two rolls if you have advantage, and use the lower roll if you have disadvantage. For example, if you have disadvantage and roll a 17 and a 5, you use the 5. If you instead have advantage and roll those numbers, you use the 17.\n\nIf multiple situations affect a roll and each one grants advantage or imposes disadvantage on it, you don't roll more than one additional d20. If two favorable situations grant advantage, for example, you still roll only one additional d20.\n\nIf circumstances cause a roll to have both advantage and disadvantage, you are considered to have neither of them, and you roll one d20. This is true even if multiple circumstances impose disadvantage and only one grants advantage or vice versa. In such a situation, you have neither advantage nor disadvantage.\n\nWhen you have advantage or disadvantage and something in the game, such as the halfling's Lucky trait, lets you reroll the d20, you can reroll only one of the dice. You choose which one. For example, if a halfling has advantage or disadvantage on an ability check and rolls a 1 and a 13, the halfling could use the Lucky trait to reroll the 1.\n\nYou usually gain advantage or disadvantage through the use of special abilities, actions, or spells. Inspiration can also give a character advantage. The\n\nGM can also decide that circumstances influence a roll in one direction or the other and grant advantage or impose disadvantage as a result.",
+    "aliases": [
+      "advantage",
+      "disadvantage"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "passive-checks",
+    "term": "Passive Checks",
+    "category": "rulings",
+    "short": "A passive check is 10 + the modifier. Advantage adds 5 and disadvantage subtracts 5.",
+    "body": "A passive check is a special kind of ability check that doesn't involve any die rolls. Such a check can represent the average result for a task done repeatedly, such as searching for secret doors over and over again, or can be used when the GM wants to secretly determine whether the characters succeed at something without rolling dice, such as noticing a hidden monster.\n\nHere's how to determine a character's total for a passive check:\n\n10 + all modifiers that normally apply to the check\n\nIf the character has advantage on the check, add 5. For disadvantage, subtract 5. The game refers to a passive check total as a **score**.\n\nFor example, if a 1st-level character has a Wisdom of 15 and proficiency in Perception, he or she has a passive Wisdom (Perception) score of 14.\n\nThe rules on hiding in the \"Dexterity\" section below rely on passive checks, as do the exploration rules.",
+    "aliases": [
+      "passive perception",
+      "passive"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "group-checks",
+    "term": "Group Checks",
+    "category": "rulings",
+    "short": "When a number of individuals are trying to accomplish something as a group, the GM might ask for a group ability check.",
+    "body": "When a number of individuals are trying to accomplish something as a group, the GM might ask for a group ability check. In such a situation, the characters who are skilled at a particular task help cover those who aren't.\n\nTo make a group ability check, everyone in the group makes the ability check. If at least half the group succeeds, the whole group succeeds. Otherwise, the group fails.\n\nGroup checks don't come up very often, and they're most useful when all the characters succeed or fail as a group. For example, when adventurers are navigating a swamp, the GM might call for a group Wisdom (Survival) check to see if the characters can avoid the quicksand, sinkholes, and other natural hazards of the environment. If at least half the group succeeds, the successful characters are able to guide their companions out of danger. Otherwise, the group stumbles into one of these hazards.",
+    "aliases": [
+      "group check"
+    ],
+    "related": [
+      "advantage"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "contests",
+    "term": "Contests",
+    "category": "rulings",
+    "short": "Sometimes one character's or monster's efforts are directly opposed to another's.",
+    "body": "Sometimes one character's or monster's efforts are directly opposed to another's. This can occur when both of them are trying to do the same thing and only one can succeed, such as attempting to snatch up a magic ring that has fallen on the floor. This situation also applies when one of them is trying to prevent the other one from accomplishing a goal--for example, when a monster tries to force open a door that an adventurer is holding closed. In situations like these, the outcome is determined by a special form of ability check, called a contest.\n\nBoth participants in a contest make ability checks appropriate to their efforts. They apply all appropriate bonuses and penalties, but instead of comparing the total to a DC, they compare the totals of their two checks. The participant with the higher check total wins the contest. That character or monster either succeeds at the action or prevents the other one from succeeding.\n\nIf the contest results in a tie, the situation remains the same as it was before the contest. Thus, one contestant might win the contest by default. If two characters tie in a contest to snatch a ring off the floor, neither character grabs it. In a contest between a monster trying to open a door and an adventurer trying to keep the door closed, a tie means that the door remains shut.",
+    "aliases": [
+      "opposed",
+      "contest"
+    ],
+    "related": [
+      "grappling-and-shoving"
+    ]
+  },
+  {
+    "edition": "2014",
+    "source": "SRD 5.1",
+    "id": "skills",
+    "term": "Skills by Ability",
+    "category": "rulings",
+    "short": "Strength has Athletics. Dexterity has Acrobatics, Sleight of Hand, and Stealth.",
+    "body": "Each ability covers a broad range of capabilities, including skills that a character or a monster can be proficient in. A skill represents a specific aspect of an ability score, and an individual's proficiency in a skill demonstrates a focus on that aspect. (A character's starting skill proficiencies are determined at character creation, and a monster's skill proficiencies appear in the monster's stat block.)\n\nFor example, a Dexterity check might reflect a character's attempt to pull off an acrobatic stunt, to palm an object, or to stay hidden. Each of these aspects of Dexterity has an associated skill: Acrobatics, Sleight of Hand, and Stealth, respectively. So a character who has proficiency in the Stealth skill is particularly good at Dexterity checks related to sneaking and hiding.\n\nThe skills related to each ability score are shown in the following list. (No skills are related to Constitution.) See an ability's description in the later sections of this section for examples of how to use a skill associated with an ability.\n\n**Strength**\n- Athletics\n\n**Dexterity**\n- Acrobatics\n- Sleight of Hand\n- Stealth\n\n**Intelligence**\n- Arcana\n- History\n- Investigation\n- Nature\n- Religion\n\n**Wisdom**\n- Animal Handling\n- Insight\n- Medicine\n- Perception\n- Survival\n\n**Charisma**\n- Deception\n- Intimidation\n- Performance\n- Persuasion\n\nSometimes, the GM might ask for an ability check using a specific skill-for example, \"Make a Wisdom (Perception) check.\" At other times, a player might ask the GM if proficiency in a particular skill applies to a check. In either case, proficiency in a skill means an individual can add his or her proficiency bonus to ability checks that involve that skill. Without proficiency in the skill, the individual makes a normal ability check.\n\nFor example, if a character attempts to climb up a dangerous cliff, the GM might ask for a Strength (Athletics) check. If the character is proficient in Athletics, the character's proficiency bonus is added to the Strength check. If the character lacks that proficiency, he or she just makes a Strength check.\n\n**Variant: Skills with Different Abilities**\n\nNormally, your proficiency in a skill applies only to a specific kind of ability check. Proficiency in Athletics, for example, usually applies to Strength checks. In some situations, though, your proficiency might reasonably apply to a different kind of check. In such cases, the GM might ask for a check using an unusual combination of ability and skill, or you might ask your GM if you can apply a proficiency to a different check. For example, if you have to swim from an offshore island to the mainland, your GM might call for a Constitution check to see if you have the stamina to make it that far. In this case, your GM might allow you to apply your proficiency in Athletics and ask for a Constitution (Athletics) check. So if you're proficient in Athletics, you apply your proficiency bonus to the Constitution check just as you would normally do for a Strength (Athletics) check. Similarly, when your half-orc barbarian uses a display of raw strength to intimidate an enemy, your GM might ask for a Strength (Intimidation) check, even though Intimidation is normally associated with Charisma.",
+    "related": [
+      "advantage"
+    ]
+  }
+]
