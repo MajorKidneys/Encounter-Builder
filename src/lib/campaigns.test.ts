@@ -12,6 +12,7 @@ import {
 } from "./campaigns";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { makeCharacter } from "./characters";
+import { storeAdapter } from "./store";
 
 const encounter = { id: "e1", name: "Death House", archived: false, createdAt: 1, combatants: [] };
 
@@ -125,5 +126,52 @@ describe("useCampaignStore", () => {
     expect(reloaded.activeId).toBe(home);
     expect(reloaded.data[home]?.encounters[0]?.name).toBe("Death House");
     expect(reloaded.data[home]?.characters[0]?.name).toBe("Nyx");
+  });
+});
+
+describe("encounter folders", () => {
+  const folder = { id: "f1", name: "If they join the band", parentId: null, sort: 1 };
+
+  it("starts empty, keeps folders per campaign, and clears them with the campaign", () => {
+    const first = loadCampaignStore(localStorage);
+    expect(first.data[first.activeId]?.folders).toEqual([]);
+    const second = addCampaign(first, "Testing");
+    second.data[first.activeId]!.folders = [folder];
+    saveCampaignStore(localStorage, second);
+
+    const loaded = loadCampaignStore(localStorage);
+    expect(loaded.data[first.activeId]?.folders).toEqual([folder]);
+    expect(loaded.data[second.activeId]?.folders).toEqual([]);
+    expect(localStorage.getItem(campaignDataKey(first.activeId, "folders"))).toContain("band");
+
+    removeCampaignData(localStorage, first.activeId);
+    expect(localStorage.getItem(campaignDataKey(first.activeId, "folders"))).toBeNull();
+  });
+
+  it("migrates the old single campaign with no folders and ignores malformed ones", () => {
+    localStorage.setItem("dm-encounters-v1", JSON.stringify([encounter]));
+    const migrated = loadCampaignStore(localStorage);
+    expect(migrated.data[migrated.activeId]?.folders).toEqual([]);
+    localStorage.setItem(
+      campaignDataKey(migrated.activeId, "folders"),
+      JSON.stringify([folder, { id: 3 }, "x"]),
+    );
+    expect(loadCampaignStore(localStorage).data[migrated.activeId]?.folders).toEqual([folder]);
+  });
+
+  it("saves folders and encounter placement through the hook", async () => {
+    const { result } = renderHook(() => useCampaignStore());
+    await waitFor(() => expect(result.current.ready).toBe(true));
+    const id = result.current.campaignId!;
+    act(() => {
+      result.current.setFolders([folder]);
+      result.current.setEncounters([{ ...encounter, folderId: "f1", sort: 1 }]);
+    });
+    const saved = () => loadCampaignStore(storeAdapter);
+    await waitFor(() => expect(saved().data[id]?.folders).toEqual([folder]));
+    expect(saved().data[id]?.encounters[0]).toMatchObject({
+      folderId: "f1",
+      sort: 1,
+    });
   });
 });

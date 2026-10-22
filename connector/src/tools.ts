@@ -1,6 +1,7 @@
 import { bestScore, rank } from "./matching.js";
 import type { LibraryMonster } from "@/lib/monsters";
-import { pickCampaign, type CampaignView } from "./model.js";
+import { buildTree, encounterParent, folderPath, type TreeNode } from "@/lib/folders";
+import { pickCampaign, type CampaignView, type Encounter } from "./model.js";
 
 const LIMIT = 15;
 
@@ -71,14 +72,36 @@ export function findNpc(campaigns: CampaignView[], name: string, campaign?: stri
   };
 }
 
+const folderOf = (c: CampaignView, e: Encounter) =>
+  folderPath(c.folders, encounterParent(c.folders, e)) || null;
+
 export function findEncounter(campaigns: CampaignView[], name: string, campaign?: string) {
   const c = pickCampaign(campaigns, campaign);
-  const matches = rank(c.encounters, (e) => bestScore(name, [e.name]), LIMIT).map((e) => ({
+  const matches = rank(
+    c.encounters,
+    (e) => bestScore(name, [e.name, ...(e.aliases ?? [])]),
+    LIMIT,
+  ).map((e) => ({
     id: e.id,
     name: e.name,
+    aliases: e.aliases ?? [],
+    folder: folderOf(c, e),
+    session: e.session || null,
+    location: e.location || null,
+    status: e.status ?? null,
     archived: Boolean(e.archived),
     round: e.round && e.round > 0 ? e.round : null,
     setting: e.setting || null,
+    trigger: e.trigger || null,
+    tactics: e.tactics || null,
+    morale: e.morale || null,
+    beats: e.beats ?? [],
+    roomLoot: (e.roomLoot ?? []).map((l) => ({
+      name: l.name,
+      condition: l.condition ?? null,
+      value: l.value ?? null,
+      taken: Boolean(l.taken),
+    })),
     combatants: e.combatants.map((cb) => ({
       name: cb.name,
       qty: cb.qty ?? 1,
@@ -88,6 +111,42 @@ export function findEncounter(campaigns: CampaignView[], name: string, campaign?
     })),
   }));
   return { campaign: c.name, totalEncounters: c.encounters.length, matches };
+}
+
+type Outline = { folder: string; id: string; items: Outline[] } | OutlineEncounter;
+type OutlineEncounter = {
+  encounter: string;
+  id: string;
+  session: string | null;
+  location: string | null;
+  status: string | null;
+  archived: boolean;
+  hasSetting: boolean;
+};
+
+/** Every encounter, laid out the way the sidebar shows them: folders nested, in sidebar order. */
+export function listEncounters(campaigns: CampaignView[], campaign?: string) {
+  const c = pickCampaign(campaigns, campaign);
+  const walk = (nodes: TreeNode[]): Outline[] =>
+    nodes.map((n) =>
+      n.type === "folder"
+        ? { folder: n.folder.name, id: n.folder.id, items: walk(n.children) }
+        : {
+            encounter: n.encounter.name,
+            id: n.encounter.id,
+            session: n.encounter.session || null,
+            location: n.encounter.location || null,
+            status: n.encounter.status ?? null,
+            archived: Boolean(n.encounter.archived),
+            hasSetting: Boolean(n.encounter.setting),
+          },
+    );
+  return {
+    campaign: c.name,
+    totalEncounters: c.encounters.length,
+    totalFolders: c.folders.length,
+    outline: walk(buildTree({ folders: c.folders, encounters: c.encounters })),
+  };
 }
 
 export function findLoot(campaigns: CampaignView[], name: string, campaign?: string) {

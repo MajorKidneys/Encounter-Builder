@@ -1,7 +1,7 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { BookOpen, Check, Plus, Trash2, X } from "lucide-react";
-import { type Spell, type SpellList, levelLabel, useSpells } from "@/lib/spells";
+import { type Spell, type SpellList, levelLabel, useSpells, visibleSpells } from "@/lib/spells";
 import { uid } from "@/lib/encounters";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,16 +70,17 @@ function SpellsPage() {
   const target = !list ? (lists.find((l) => l.id === addTo) ?? null) : null;
 
   const results = useMemo(
-    () =>
-      (spells ?? []).filter(
-        (s) =>
-          (!list || list.spellIds.includes(s.id)) &&
-          (!q || s.name.toLowerCase().includes(q.toLowerCase())) &&
-          (level === "" || s.level === Number(level)) &&
-          (!cls || s.classes.includes(cls)),
-      ),
+    () => visibleSpells(spells ?? [], list, { q, level, cls }),
     [spells, list, q, level, cls],
   );
+  const startAdding = (listId: string) => {
+    setQ("");
+    setLevel("");
+    setCls("");
+    void navigate({
+      search: (prev) => ({ ...(prev.spell ? { spell: prev.spell } : {}), addTo: listId }),
+    });
+  };
   const sel = spells?.find((s) => s.id === selId) ?? null;
   const toggle = (lid: string, sid: string) =>
     setLists((all) =>
@@ -140,14 +141,7 @@ function SpellsPage() {
               <Button
                 variant="outline"
                 className="justify-self-start"
-                onClick={() =>
-                  void navigate({
-                    search: (prev) => ({
-                      ...(prev.spell ? { spell: prev.spell } : {}),
-                      addTo: list.id,
-                    }),
-                  })
-                }
+                onClick={() => startAdding(list.id)}
               >
                 <Plus /> Add spells
               </Button>
@@ -155,11 +149,26 @@ function SpellsPage() {
           ) : (
             <>
               <h2 className="font-display text-2xl font-bold tracking-tight">Spell Book</h2>
-              <Input
-                placeholder="Search spells…"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  aria-label="Search spells"
+                  placeholder="Search spells…"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  className="pr-8"
+                />
+                {q && (
+                  <button
+                    type="button"
+                    aria-label="Clear search"
+                    title="Clear search"
+                    onClick={() => setQ("")}
+                    className="absolute right-1.5 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded text-muted-foreground hover:bg-accent"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
               <div className="flex gap-2">
                 <select
                   aria-label="Level"
@@ -241,7 +250,7 @@ function SpellsPage() {
           {list && list.spellIds.length === 0 && (
             <li className="grid justify-items-start gap-3 p-4 text-sm text-muted-foreground">
               No spells on this list yet.
-              <Button onClick={() => void navigate({ search: { addTo: list.id } })}>
+              <Button onClick={() => startAdding(list.id)}>
                 <Plus /> Add spells
               </Button>
             </li>

@@ -104,9 +104,31 @@ export const groupSchema = z
   .refine((g) => g.monster || g.custom, { message: "Each group needs `monster` or `custom`" });
 export type GroupInput = z.infer<typeof groupSchema>;
 
+export const LOCATION_MAX = 60;
+export const locationSchema = z
+  .string()
+  .max(
+    LOCATION_MAX,
+    `Location is a short room key (${LOCATION_MAX} characters or fewer), like "U3" or "G1 Conservatory". Scene prose belongs in setting.`,
+  );
+
+export const folderSchema = z
+  .string()
+  .refine((p) => p.split("/").filter((x) => x.trim()).length <= 3, {
+    message: 'Folders nest 3 levels deep at most, e.g. "If they join the band / Sent on the raid".',
+  })
+  .describe(
+    'Folder path in the sidebar, outermost first, e.g. "Night 1 / River Fort". Created if missing, 3 levels at most. Group by story branch, not by session. Leave out for the top level.',
+  );
+
 export const beatSchema = z.object({
   round: z
-    .union([z.number().int().min(1), z.string()])
+    .union([
+      z.number().int().min(1),
+      z
+        .string()
+        .regex(/^\s*\d+\s*\+\s*$/, 'Use a round number, or "6+" for round 6 and every round after'),
+    ])
     .describe('A round number, or "6+" for round 6 and every round after'),
   text: z.string(),
 });
@@ -114,24 +136,27 @@ export const beatSchema = z.object({
 export const encounterSchema = z.object({
   name: z.string().min(1),
   aliases: z.array(z.string()).optional(),
-  location: z
-    .string()
+  folder: folderSchema.optional(),
+  location: locationSchema
     .optional()
     .describe(
-      'Room or scene key from the adventure, e.g. "G1" or "U3 Orlen\'s Chamber". If none, the scene name.',
+      'A short room or scene key from the adventure, e.g. "G1" or "U3 Orlen\'s Chamber"; 60 characters at most. If none, the scene name. Never a paragraph.',
     ),
   status: z
     .enum(["staged", "dormant"])
     .optional()
     .describe("dormant = only happens on a condition (give a trigger)"),
-  trigger: z.string().optional(),
-  tactics: z.string().optional(),
-  morale: z.string().optional(),
+  trigger: z
+    .string()
+    .optional()
+    .describe("PREP NOTE. What has to happen first, for a dormant encounter."),
+  tactics: z.string().optional().describe("PREP NOTE (DM only). How they fight."),
+  morale: z.string().optional().describe("PREP NOTE (DM only). When and how they break or run."),
   setting: z
     .string()
     .optional()
     .describe(
-      "One paragraph the GM reads at the table: where they are and what is immediately visible. Not the whole read-aloud or the room's lore.",
+      "SETTING (read aloud): one short paragraph the GM reads to the table, where they are and what is immediately visible. Not tactics, not loot, not the room's lore. Those are prep notes.",
     ),
   beats: z.array(beatSchema).optional(),
   groups: z.array(groupSchema).default([]),

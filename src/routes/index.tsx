@@ -18,11 +18,11 @@ import {
   turnOrder,
 } from "@/lib/turns";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { useWorkspace } from "@/components/Workspace";
 import { InitiativeList } from "@/components/encounter/InitiativeList";
 import { AddCombatant } from "@/components/encounter/AddCombatant";
 import { PrepNotes } from "@/components/encounter/PrepNotes";
+import { SettingCard } from "@/components/encounter/SettingCard";
 import { CreatureDrawer } from "@/components/encounter/CreatureDrawer";
 import { Stage } from "@/components/Stage";
 import { RefTerm } from "@/components/reference/RefTerm";
@@ -284,20 +284,20 @@ function Index() {
               This encounter is archived. You can still edit it.
             </p>
           )}
-          <section aria-label="Setting" className="mb-4">
-            <label htmlFor="encounter-setting" className="label-caps">
-              Setting
-            </label>
-            <Textarea
-              id="encounter-setting"
-              aria-label="Setting"
+          <div className="mb-4 grid gap-3">
+            <SettingCard
+              key={active.id}
               value={active.setting ?? ""}
-              placeholder="Where this happens, and what the party sees when they arrive."
-              onChange={(ev) => update((e) => ({ ...e, setting: ev.target.value }))}
-              className="mt-1.5 min-h-28"
+              onSave={(text) =>
+                update((e) => {
+                  const { setting: _old, ...rest } = e;
+                  void _old;
+                  return text.trim() ? { ...rest, setting: text } : rest;
+                })
+              }
             />
-          </section>
-          <PrepNotes encounter={active} update={update} />
+            <PrepNotes encounter={active} update={update} />
+          </div>
           <div className="grid gap-4">
             <InitiativeList
               encounter={active}

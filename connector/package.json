@@ -1,6 +1,6 @@
 {
   "name": "encounter-tracker-connector",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "MCP server that lets Claude read (and later build) encounters in the Encounter Tracker's data file.",

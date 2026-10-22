@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Archive,
@@ -7,10 +7,10 @@ import {
   Library,
   PanelLeftClose,
   PanelLeftOpen,
+  FolderPlus,
   Plus,
   Settings,
   Swords,
-  Trash2,
   Users,
 } from "lucide-react";
 import { uid, type Encounter } from "@/lib/encounters";
@@ -21,12 +21,14 @@ import {
   makeCharacter,
   type CharacterRole,
 } from "@/lib/characters";
-import { DEFAULT_CAMPAIGN_NAME, useCampaignStore } from "@/lib/campaigns";
+import { useCampaignStore } from "@/lib/campaigns";
+import { CampaignSwitcher } from "@/components/CampaignSwitcher";
+import { EncounterTree } from "@/components/EncounterTree";
+import { nextSort } from "@/lib/folders";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { ReferenceProvider, useReference } from "@/components/reference/ReferenceLayer";
-import { Textarea } from "@/components/ui/textarea";
 import { applyTheme, readTheme, writeTheme, type ThemeChoice } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -51,7 +53,7 @@ export function Workspace({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(true);
   const [theme, setTheme] = useState<ThemeChoice>("auto");
   const [renameArmed, setRenameArmed] = useState(false);
-  const nameRef = useRef<HTMLTextAreaElement>(null);
+  const [folderSignal, setFolderSignal] = useState(0);
   const navigate = useNavigate();
   const location = useRouterState({ select: (s) => s.location });
   const isSpells = location.pathname === "/spells";
@@ -71,13 +73,6 @@ export function Workspace({ children }: { children: ReactNode }) {
     media.addEventListener("change", onChange);
     return () => media.removeEventListener("change", onChange);
   }, []);
-
-  useEffect(() => {
-    if (!renameArmed || !campaigns.ready) return;
-    nameRef.current?.focus();
-    nameRef.current?.select();
-    setRenameArmed(false);
-  }, [renameArmed, campaigns.ready, campaigns.campaignId]);
 
   const leaveScopedPage = () => {
     if (isSpells) void navigate({ to: "/spells", search: {} });
@@ -109,18 +104,25 @@ export function Workspace({ children }: { children: ReactNode }) {
     setActiveId(null);
     leaveScopedPage();
   };
-  const newEncounter = () => {
+  const createEncounter = (folderId: string | null = null) => {
+    const sort = nextSort(
+      { folders: campaigns.folders, encounters: campaigns.encounters },
+      folderId,
+    );
     const encounter: Encounter = {
       id: uid(),
       name: `Encounter ${campaigns.encounters.length + 1}`,
       archived: false,
       createdAt: Date.now(),
       combatants: [],
+      ...(folderId ? { folderId } : {}),
+      sort,
     };
     campaigns.setEncounters((all) => [...all, encounter]);
     setActiveId(encounter.id);
     void navigate({ to: "/" });
   };
+  const newEncounter = () => createEncounter();
   const addCharacter = (role: CharacterRole) => {
     const created = makeCharacter(role);
     campaigns.setCharacters((all) => [...all, created]);
@@ -169,51 +171,19 @@ export function Workspace({ children }: { children: ReactNode }) {
                       >
                         <Plus />
                       </Button>
-                      {campaigns.campaigns.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
-                          aria-label="Delete campaign"
-                          title="Delete campaign"
-                          onClick={deleteCampaign}
-                        >
-                          <Trash2 />
-                        </Button>
-                      )}
                     </div>
                   </div>
-                  <select
-                    aria-label="Campaign"
-                    className="mt-1 h-8 w-full rounded-md border border-input bg-card px-2 text-sm"
-                    value={campaigns.campaignId ?? ""}
-                    disabled={!campaigns.ready}
-                    onChange={(e) => chooseCampaign(e.target.value)}
-                  >
-                    {campaigns.campaigns.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name || "Untitled campaign"}
-                      </option>
-                    ))}
-                  </select>
-                  <Textarea
-                    ref={nameRef}
-                    aria-label="Campaign name"
-                    value={campaigns.campaign?.name ?? ""}
-                    rows={2}
-                    disabled={!campaigns.ready}
-                    onChange={(e) => campaigns.renameCampaign(e.target.value.replace(/\n/g, " "))}
-                    onBlur={() => {
-                      if (campaigns.ready && !campaigns.campaign?.name.trim())
-                        campaigns.renameCampaign(DEFAULT_CAMPAIGN_NAME);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        e.currentTarget.blur();
-                      }
-                    }}
-                    className="mt-1 min-h-0 w-full resize-none border-transparent bg-transparent px-1 py-0.5 font-display text-lg font-semibold leading-6 shadow-none hover:border-input focus-visible:border-primary focus-visible:ring-0 disabled:opacity-100 md:text-lg"
+                  <CampaignSwitcher
+                    ready={campaigns.ready}
+                    campaigns={campaigns.campaigns}
+                    activeId={campaigns.campaignId}
+                    name={campaigns.campaign?.name ?? ""}
+                    renameArmed={renameArmed}
+                    onRenameArmed={() => setRenameArmed(false)}
+                    onChoose={chooseCampaign}
+                    onRename={campaigns.renameCampaign}
+                    onCreate={createCampaign}
+                    onDelete={deleteCampaign}
                   />
                 </div>
               )}
@@ -230,43 +200,33 @@ export function Workspace({ children }: { children: ReactNode }) {
             </div>
             {open ? (
               <nav className="flex-1 overflow-y-auto px-3 py-4">
-                <h2 className="label-caps mb-1.5 px-2.5">Encounters</h2>
-                {campaigns.encounters.length === 0 && (
-                  <p className="px-2 text-sm text-muted-foreground">No encounters yet.</p>
-                )}
-                <ul className="space-y-1">
-                  {campaigns.encounters.map((e) => (
-                    <li key={e.id}>
-                      <Button
-                        asChild
-                        variant="ghost"
-                        className={cn(
-                          navClass,
-                          !isSpells && active?.id === e.id ? activeClass : inactiveClass,
-                          e.archived && "text-muted-foreground",
-                        )}
-                      >
-                        <Link
-                          to="/"
-                          onClick={() => setActiveId(e.id)}
-                          aria-current={!isSpells && active?.id === e.id ? "page" : undefined}
-                        >
-                          <span className="min-w-0 truncate">{e.name}</span>
-                          {e.archived ? (
-                            <Archive className="text-muted-foreground" />
-                          ) : (e.round ?? 0) > 0 ? (
-                            <span
-                              className="font-mono text-[10.5px] text-wine-ink"
-                              title={`Round ${e.round}`}
-                            >
-                              R{e.round}
-                            </span>
-                          ) : null}
-                        </Link>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
+                <div className="mb-1.5 flex items-center justify-between px-2.5">
+                  <h2 className="label-caps">Encounters</h2>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="-my-1 h-7 w-7"
+                    aria-label="New folder"
+                    title="New folder"
+                    onClick={() => setFolderSignal((n) => n + 1)}
+                  >
+                    <FolderPlus />
+                  </Button>
+                </div>
+                <EncounterTree
+                  folders={campaigns.folders}
+                  encounters={campaigns.encounters}
+                  setFolders={campaigns.setFolders}
+                  setEncounters={campaigns.setEncounters}
+                  activeId={active?.id}
+                  showActive={!isSpells && !isParty}
+                  onSelect={setActiveId}
+                  onCreateEncounter={createEncounter}
+                  newFolderSignal={folderSignal}
+                  navClass={navClass}
+                  activeClass={activeClass}
+                  inactiveClass={inactiveClass}
+                />
                 <Button
                   variant="ghost"
                   className="mt-1 w-full justify-start px-2.5 font-normal text-muted-foreground"
