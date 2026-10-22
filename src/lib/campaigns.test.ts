@@ -12,6 +12,7 @@ import {
 } from "./campaigns";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { makeCharacter } from "./characters";
+import { storeAdapter } from "./store";
 
 const encounter = { id: "e1", name: "Death House", archived: false, createdAt: 1, combatants: [] };
 
@@ -166,8 +167,11 @@ describe("encounter folders", () => {
       result.current.setFolders([folder]);
       result.current.setEncounters([{ ...encounter, folderId: "f1", sort: 1 }]);
     });
-    const reloaded = loadCampaignStore(localStorage);
-    expect(reloaded.data[id]?.folders).toEqual([folder]);
-    expect(reloaded.data[id]?.encounters[0]).toMatchObject({ folderId: "f1", sort: 1 });
+    const saved = () => loadCampaignStore(storeAdapter);
+    await waitFor(() => expect(saved().data[id]?.folders).toEqual([folder]));
+    expect(saved().data[id]?.encounters[0]).toMatchObject({
+      folderId: "f1",
+      sort: 1,
+    });
   });
 });
